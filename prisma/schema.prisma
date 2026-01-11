@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model team {
+  id        String   @id @default(uuid())
+  name      String
+  lastName  String
+  email     String   @unique
+  password  String
+  role      Role     @default(COLLABORATOR)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model client {
+  id        String   @id @default(uuid())
+  name      String
+  lastName  String
+  email     String   @unique
+  password  String
+  role      Role     @default(CLIENT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  COLLABORATOR
+  CLIENT
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  title         String
+  description   String?
+  price         Float
+  discountPrice Float?
+  specs         Json?
+  createdAt     DateTime @default(now())
+  isActive      Boolean  @default(true)
+
+  variants ProductVariant[]
+
+  images     ProductImage[]
+  categories ProductCategory[]
+
+  brand   Brand?  @relation(fields: [brandId], references: [id])
+  brandId String?
+}
+
+model ProductVariant {
+  id       String @id @default(uuid())
+  color    String @default("#ffffff")
+  name     String @default("Branco")
+  quantity Int    @default(0)
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductImage {
+  id  String @id @default(uuid())
+  url String
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductCategory {
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  @@id([productId, categoryId])
+  @@index([categoryId])
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+  isHome      Boolean  @default(false)
+
+  products ProductCategory[]
+}
+
+model Brand {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isActive  Boolean   @default(true)
+}
+
+model banner {
+  id                String   @id @default(uuid())
+  title             String
+  subtitle          String?
+  linkUrl           String?
+  imageDesktop      String?
+  imageMobile       String?
+  resolutionDesktop String?
+  resolutionMobile  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  isActive          Boolean  @default(true)
+}
+
+model newsletter {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  whatsapp  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StoreConfiguration {
+  id String @id @default(uuid())
+
+  maintenanceMode    Boolean @default(false)
+  maintenanceMessage String?
+
+  socialMedias SocialMedia[]
+
+  storeName   String
+  cnpj        String
+  description String?
+  phone       String?
+  whatsapp    String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+
+  googleMapsEmbedUrl String?
+
+  businessHours String?
+
+  contactEmail        String
+  notifyNewOrders     Boolean @default(false)
+  automaticNewsletter Boolean @default(false)
+
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+
+  currency String @default("BRL")
+  locale   String @default("pt-BR")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SocialMedia {
+  id       String  @id @default(uuid())
+  platform String  @unique
+  url      String
+  isActive Boolean @default(true)
+
+  storeConfig   StoreConfiguration @relation(fields: [storeConfigId], references: [id])
+  storeConfigId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

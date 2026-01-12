@@ -6,6 +6,7 @@ import { prisma } from "./prisma";
 export const auth: NextAuthOptions = {
     pages: {
         signIn: "/login",
+        error: "/login",
     },
     session: {
         strategy: "jwt",
@@ -21,16 +22,26 @@ export const auth: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
+                if (!credentials?.email || !credentials?.password) {
+                    throw new Error("invalid_credentials");
+                }
 
                 const team = await prisma.team.findUnique({
                     where: { email: credentials.email },
                 });
 
-                if (!team || !team.password) return null;
+                if (!team) {
+                    throw new Error("invalid_credentials");
+                }
+
+                if (!team.password) {
+                    throw new Error("invalid_credentials");
+                }
 
                 const ok = await bcrypt.compare(credentials.password, team.password);
-                if (!ok) return null;
+                if (!ok) {
+                    throw new Error("invalid_credentials");
+                }
 
                 return {
                     id: String(team.id),
@@ -61,8 +72,8 @@ export const auth: NextAuthOptions = {
             }
             return session;
         },
-        async redirect() {
-            return "/admin";
+        async redirect({ baseUrl }) {
+            return `${baseUrl}/admin`;
         }
     }
 }

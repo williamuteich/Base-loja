@@ -31,7 +31,7 @@ export default function CategoryCarousel({ categories, backendUrl }: CategoryCar
                         <Link
                             key={category.id}
                             href={`/produtos?categoria=${category.name}`}
-                            className="group/card relative flex-none w-32 md:w-44 lg:w-52"
+                            className="group/card relative flex-none w-32 md:w-44 lg:w-52 snap-start"
                         >
                             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-sm group-hover/card:shadow-lg transition-all duration-500 border border-slate-100 bg-white">
                                 {category.imageUrl ? (

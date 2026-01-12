@@ -14,7 +14,8 @@ import {
     Linkedin,
     MessageCircle,
     Music,
-    Mail
+    Mail,
+    Store
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchHeader from "./searchHeader";
@@ -119,10 +120,12 @@ export default function HeaderDesk({ config }: HeaderProps) {
                     <div className="flex items-center justify-between h-full gap-6 transition-all duration-300">
                         <Link href="/" className="flex items-center gap-3 shrink-0 group">
                             <div className="w-13 h-13 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                                {config?.logoUrl ? (
+                                {config?.logoUrl && config.logoUrl !== "null" ? (
                                     <Image src={config.logoUrl} width={52} height={43} alt="Logo" priority className="rounded-full object-contain" />
                                 ) : (
-                                    <Image src="/logoBazar.png" width={52} height={43} alt="Logo" priority className="rounded-full object-contain" />
+                                    <div className="w-13 h-13 flex items-center justify-center bg-pink-100 rounded-full text-pink-700 shadow-inner">
+                                        <Store className="w-7 h-7" />
+                                    </div>
                                 )}
                             </div>
                             <div className="flex flex-col">
@@ -131,7 +134,7 @@ export default function HeaderDesk({ config }: HeaderProps) {
                                 </span>
                                 <div className="flex items-center gap-2 -mt-0.5">
                                     <span className="text-[10px] text-muted-foreground uppercase tracking-wider line-clamp-1 opacity-80">
-                                        Barra do Quarai
+                                        {config?.city && config?.state ? `${config.city} - ${config.state}` : 'Barra do Quarai'}
                                     </span>
                                 </div>
                             </div>

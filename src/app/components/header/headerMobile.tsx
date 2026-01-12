@@ -16,7 +16,8 @@ import {
     Youtube,
     Linkedin,
     MessageCircle,
-    Music
+    Music,
+    Store
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchHeader from "./searchHeader";
@@ -74,10 +75,12 @@ export default function HeaderMobile({ config }: HeaderProps) {
                     )}>
                         <Link href="/" className="flex items-center gap-3 shrink-0 group">
                             <div className="w-13 h-13 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                                {config?.logoUrl ? (
+                                {config?.logoUrl && config.logoUrl !== "null" ? (
                                     <Image src={config.logoUrl} width={52} height={43} alt="Logo" priority className="rounded-full object-contain" />
                                 ) : (
-                                    <Image src="/logoBazar.png" width={52} height={43} alt="Logo" priority className="rounded-full object-contain" />
+                                    <div className="w-13 h-13 flex items-center justify-center bg-pink-100 rounded-full text-pink-700 shadow-inner">
+                                        <Store className="w-7 h-7" />
+                                    </div>
                                 )}
                             </div>
                             <div className="flex flex-col">
@@ -86,7 +89,7 @@ export default function HeaderMobile({ config }: HeaderProps) {
                                 </span>
                                 <div className="flex items-center gap-2 -mt-0.5">
                                     <span className="text-[10px] text-muted-foreground uppercase tracking-wider line-clamp-1 opacity-80">
-                                        Barra do Quarai
+                                        {config?.city && config?.state ? `${config.city} - ${config.state}` : 'Barra do Quarai'}
                                     </span>
                                 </div>
                             </div>
@@ -116,13 +119,11 @@ export default function HeaderMobile({ config }: HeaderProps) {
                                         <div className="flex items-center justify-between p-6 bg-linear-to-r from-pink-600 to-pink-700 text-white shadow-lg sticky top-0 z-10">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-12 h-12 bg-white/20 backdrop-blur-md flex items-center justify-center rounded-2xl overflow-hidden">
-                                                    {config?.logoUrl ? (
+                                                    {config?.logoUrl && config.logoUrl !== "null" ? (
                                                         <Image src={config.logoUrl} width={42} height={34} alt="Logo" className="rounded-lg object-contain brightness-110" />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center bg-white/10">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 opacity-60">
-                                                                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                                                            </svg>
+                                                            <Store className="w-6 h-6 text-white opacity-80" />
                                                         </div>
                                                     )}
                                                 </div>

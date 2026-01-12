@@ -39,13 +39,13 @@ export default function Header() {
                     </Suspense>
                 }
                 menuBrandSlot={
-                    <Suspense fallback={<div className="w-32 h-8 bg-white/10 animate-pulse rounded" />}>
-                        <StoreBrand mobile onPink />
+                    <Suspense fallback={<div className="w-32 h-8 bg-slate-100 animate-pulse rounded" />}>
+                        <StoreBrand mobile />
                     </Suspense>
                 }
                 socialSlot={
                     <Suspense fallback={<div className="w-full h-20 bg-slate-100 animate-pulse rounded-xl mt-4" />}>
-                        <SocialLinks />
+                        <SocialLinks variant="featured" />
                     </Suspense>
                 }
             />

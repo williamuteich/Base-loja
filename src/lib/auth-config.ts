@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import prisma from "@/lib/db";
+import { prisma } from "./prisma";
 
 export const auth: NextAuthOptions = {
     pages: {
@@ -23,20 +23,20 @@ export const auth: NextAuthOptions = {
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
 
-                const user = await prisma.user.findUnique({
+                const team = await prisma.team.findUnique({
                     where: { email: credentials.email },
                 });
 
-                if (!user || !user.password) return null;
+                if (!team || !team.password) return null;
 
-                const ok = await bcrypt.compare(credentials.password, user.password);
+                const ok = await bcrypt.compare(credentials.password, team.password);
                 if (!ok) return null;
 
                 return {
-                    id: String(user.id),
-                    name: user.name,
-                    email: user.email,
-                    role: user.role
+                    id: String(team.id),
+                    name: team.name,
+                    email: team.email,
+                    role: team.role
                 };
             },
         }),
@@ -44,10 +44,10 @@ export const auth: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.id = user.id;
+                token.id = (user as any).id;
                 token.name = user.name;
                 token.email = user.email;
-                token.role = user.role;
+                (token as any).role = (user as any).role;
             }
             return token;
         },

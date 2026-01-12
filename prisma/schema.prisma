@@ -2,17 +2,19 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
   provider = "sqlite"
 }
 
-model User {
+model team {
   id        String   @id @default(uuid())
   name      String
-  lastName  String?
+  lastName  String
   email     String   @unique
   password  String
   role      Role     @default(COLLABORATOR)

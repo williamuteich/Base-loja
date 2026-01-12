@@ -12,17 +12,14 @@ import {
     Menu,
     LayoutGrid,
     Users,
-    Package,
     Folder,
     Tag,
-    Share2,
     Settings,
     Mail,
     Image as ImageIcon,
     Home,
-    LogOut,
     ShoppingBag,
-    Bell
+    ShieldCheck
 } from "lucide-react"
 
 import Link from "next/link"
@@ -38,11 +35,9 @@ export default function Sidebar() {
         { icon: Folder, label: "Categorias", href: "/admin/categories" },
         { icon: Tag, label: "Marcas", href: "/admin/brands" },
         { icon: Users, label: "Clientes", href: "/admin/clients" },
-        { icon: Users, label: "Equipe", href: "/admin/team" },
+        { icon: ShieldCheck, label: "Equipe", href: "/admin/team" },
         { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
         { icon: ImageIcon, label: "Banners", href: "/admin/banners" },
-        { icon: Share2, label: "Canais", href: "/admin/channels" },
-        { icon: Bell, label: "Notificações", href: "/admin/notifications" },
         { icon: Settings, label: "Configurações", href: "/admin/settings" },
     ]
 

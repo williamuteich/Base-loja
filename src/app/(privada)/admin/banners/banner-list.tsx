@@ -1,11 +1,20 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import { Banner } from "@/types/banner";
-import { getAdminBanners, BannersResponse } from "@/actions/banner";
-import { Plus, SquarePen, Trash2, Search, X, Loader2, ImageIcon } from "lucide-react";
-import SkeletonBanner from "./skeleton-banner";
+import { getAdminBanners, BannersResponse, createBanner, updateBanner, deleteBanner } from "@/services/banner";
+import { ImageIcon } from "lucide-react";
+import { toast } from "sonner";
+
+// Reorganized Components
+import SkeletonBanner from "./components/skeleton-banner";
+import BannerForm from "./components/banner-form";
+import BannerCard from "./components/banner-card";
+import BannerHeader from "./components/banner-header";
+import BannerPagination from "./components/banner-pagination";
+
+import GenericModal from "../../components/generic-modal";
+import DeleteConfirmation from "../../components/delete-confirmation";
 
 export default function BannerList() {
     const [banners, setBanners] = useState<Banner[]>([]);
@@ -15,14 +24,18 @@ export default function BannerList() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [search, setSearch] = useState("");
-
     const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedBanner, setSelectedBanner] = useState<Banner | undefined>(undefined);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(search);
         }, 500);
-
         return () => clearTimeout(timer);
     }, [search]);
 
@@ -50,50 +63,58 @@ export default function BannerList() {
         loadBanners();
     }, [loadBanners]);
 
-    const handleClearSearch = () => {
-        setSearch("");
+    const handleSave = async (formData: FormData) => {
+        setIsSaving(true);
+        try {
+            if (selectedBanner) {
+                await updateBanner(selectedBanner.id, formData);
+                toast.success("Banner atualizado com sucesso! ✨");
+            } else {
+                await createBanner(formData);
+                toast.success("Novo banner criado com sucesso! 🎉");
+            }
+            setIsModalOpen(false);
+            loadBanners();
+        } catch (error) {
+            console.error("Save error:", error);
+            toast.error("Erro ao salvar banner ❌");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!selectedBanner) return;
+        setIsDeleting(true);
+        try {
+            await deleteBanner(selectedBanner.id);
+            toast.success("Banner excluído com sucesso! 👋");
+            setIsDeleteModalOpen(false);
+            loadBanners();
+        } catch (error) {
+            console.error("Delete error:", error);
+            toast.error("Erro ao excluir banner ❌");
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     return (
         <div className="p-6 md:p-12">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Banners</h1>
-                <p className="text-slate-500 text-base mt-2">Controle os destaques visuais da página inicial</p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                    <input
-                        type="search"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full h-10 pl-10 pr-10 rounded-lg bg-slate-50 border border-slate-200 focus:border-slate-500 focus:bg-white text-sm transition-all focus:outline-none focus:ring-2 focus:ring-slate-500/10 placeholder:text-slate-400"
-                        placeholder="Buscar banners por título ou subtítulo..."
-                    />
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    {search && (
-                        <button
-                            onClick={handleClearSearch}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-200 text-slate-600 hover:bg-slate-300 rounded-full w-6 h-6 flex items-center justify-center transition-all"
-                        >
-                            <X className="w-3.5 h-3.5" />
-                        </button>
-                    )}
-                </div>
-                <button
-                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-300 text-white shadow-soft hover:shadow-hover h-10 px-5 py-2 bg-slate-900 hover:bg-slate-800 cursor-pointer"
-                >
-                    <Plus className="w-4 h-4" />
-                    Novo Banner
-                </button>
-            </div>
+            <BannerHeader
+                search={search}
+                onSearchChange={setSearch}
+                onClearSearch={() => setSearch("")}
+                onNewBanner={() => {
+                    setSelectedBanner(undefined);
+                    setIsModalOpen(true);
+                }}
+            />
 
             <div className="space-y-4">
                 {isLoading ? (
                     <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                            <SkeletonBanner key={i} />
-                        ))}
+                        {[1, 2, 3].map((i) => <SkeletonBanner key={i} />)}
                     </div>
                 ) : error ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-xl border border-slate-200 border-dashed">
@@ -120,91 +141,56 @@ export default function BannerList() {
                     <>
                         <div className="space-y-4">
                             {banners.map((banner, index) => (
-                                <div key={banner.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
-                                    <div className="flex items-center gap-4 p-4">
-                                        <div className="relative w-32 h-20 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-100">
-                                            {banner.imageDesktop ? (
-                                                <Image
-                                                    src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/${banner.imageDesktop}`}
-                                                    alt={banner.title}
-                                                    fill
-                                                    className="object-cover"
-                                                    priority={index === 0}
-                                                    unoptimized
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <ImageIcon className="w-6 h-6" />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold text-slate-900 truncate">{banner.title}</h3>
-                                            {banner.subtitle && (
-                                                <p className="text-sm text-slate-500 truncate">{banner.subtitle}</p>
-                                            )}
-                                            {banner.linkUrl && (
-                                                <a
-                                                    href={banner.linkUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-sm text-blue-600 hover:underline truncate block mt-0.5"
-                                                >
-                                                    {banner.linkUrl}
-                                                </a>
-                                            )}
-                                        </div>
-
-                                        <div className="flex items-center gap-3">
-                                            {banner.isActive ? (
-                                                <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 whitespace-nowrap">
-                                                    Ativo
-                                                </span>
-                                            ) : (
-                                                <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-700 whitespace-nowrap">
-                                                    Inativo
-                                                </span>
-                                            )}
-
-                                            <div className="flex items-center gap-1">
-                                                <button className="p-2 text-slate-500 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
-                                                    <SquarePen className="w-4 h-4" />
-                                                </button>
-                                                <button className="p-2 text-slate-500 hover:text-rose-500 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <BannerCard
+                                    key={banner.id}
+                                    banner={banner}
+                                    index={index}
+                                    onEdit={(b) => {
+                                        setSelectedBanner(b);
+                                        setIsModalOpen(true);
+                                    }}
+                                    onDelete={(b) => {
+                                        setSelectedBanner(b);
+                                        setIsDeleteModalOpen(true);
+                                    }}
+                                />
                             ))}
                         </div>
-
-                        {totalPages > 1 && (
-                            <div className="flex items-center justify-center gap-2 mt-8">
-                                <button
-                                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                                    disabled={page === 1}
-                                    className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Anterior
-                                </button>
-                                <span className="text-sm text-slate-500">
-                                    Página {page} de {totalPages}
-                                </span>
-                                <button
-                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                    disabled={page === totalPages}
-                                    className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Próxima
-                                </button>
-                            </div>
-                        )}
+                        <BannerPagination
+                            page={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
                     </>
                 )}
             </div>
+
+            <GenericModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={selectedBanner ? "Editar Banner" : "Novo Banner"}
+            >
+                <BannerForm
+                    banner={selectedBanner}
+                    onSave={handleSave}
+                    onCancel={() => setIsModalOpen(false)}
+                    isSaving={isSaving}
+                />
+            </GenericModal>
+
+            <GenericModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                title="Excluir Banner"
+            >
+                <DeleteConfirmation
+                    title="Cuidado! Ação irreversível"
+                    description={`Você tem certeza que deseja excluir o banner "${selectedBanner?.title}"? Esta ação não pode ser desfeita.`}
+                    onConfirm={handleDelete}
+                    onCancel={() => setIsDeleteModalOpen(false)}
+                    isDeleting={isDeleting}
+                />
+            </GenericModal>
         </div>
     );
 }

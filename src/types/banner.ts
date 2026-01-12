@@ -1,11 +1,13 @@
 export interface Banner {
-    subtitle: any;
     id: string;
     title: string;
-    description?: string;
-    imageDesktop?: string;
-    imageMobile?: string;
-    linkUrl?: string;
+    subtitle?: string | null;
+    linkUrl?: string | null;
+    imageDesktop?: string | null;
+    imageMobile?: string | null;
+    resolutionDesktop?: string | null;
+    resolutionMobile?: string | null;
     isActive: boolean;
-    order?: number;
+    createdAt: string;
+    updatedAt: string;
 }

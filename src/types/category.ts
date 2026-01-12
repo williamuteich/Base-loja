@@ -1,13 +1,10 @@
 export interface Category {
     id: string;
     name: string;
-    description: string;
-    imageUrl: string;
-    createdAt: string;
-    updatedAt: string;
+    description?: string | null;
+    imageUrl?: string | null;
     isActive: boolean;
     isHome: boolean;
-    _count: {
-        products: number;
-    };
+    createdAt: string;
+    updatedAt: string;
 }

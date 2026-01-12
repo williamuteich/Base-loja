@@ -11,7 +11,7 @@ import SkeletonBanner from "./components/skeleton-banner";
 import BannerForm from "./components/banner-form";
 import BannerCard from "./components/banner-card";
 import BannerHeader from "./components/banner-header";
-import BannerPagination from "./components/banner-pagination";
+import GenericPagination from "../../components/generic-pagination";
 
 import GenericModal from "../../components/generic-modal";
 import DeleteConfirmation from "../../components/delete-confirmation";
@@ -156,7 +156,7 @@ export default function BannerList() {
                                 />
                             ))}
                         </div>
-                        <BannerPagination
+                        <GenericPagination
                             page={page}
                             totalPages={totalPages}
                             onPageChange={setPage}

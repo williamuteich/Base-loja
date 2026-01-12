@@ -38,6 +38,7 @@ export default function Sidebar() {
         { icon: Folder, label: "Categorias", href: "/admin/categories" },
         { icon: Tag, label: "Marcas", href: "/admin/brands" },
         { icon: Users, label: "Clientes", href: "/admin/clients" },
+        { icon: Users, label: "Equipe", href: "/admin/team" },
         { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
         { icon: ImageIcon, label: "Banners", href: "/admin/banners" },
         { icon: Share2, label: "Canais", href: "/admin/channels" },

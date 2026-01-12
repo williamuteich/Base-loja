@@ -27,6 +27,7 @@ import {
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { LogoutDashboard } from "./logoutButton"
 
 export default function Sidebar() {
     const pathname = usePathname()
@@ -120,13 +121,7 @@ export default function Sidebar() {
                         <span className="font-semibold text-[15px]">Visualizar Loja</span>
                     </Link>
 
-                    <button
-                        type="button"
-                        className="w-full mt-2 flex items-center gap-3.5 px-4 py-3 text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 rounded-xl transition-all border border-transparent hover:border-rose-500/10 group"
-                    >
-                        <LogOut className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                        <span className="font-semibold text-[15px]">Encerrar Sessão</span>
-                    </button>
+                    <LogoutDashboard />
                 </div>
             </SheetContent>
         </Sheet>

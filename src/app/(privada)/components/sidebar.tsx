@@ -12,16 +12,17 @@ import {
     Menu,
     LayoutGrid,
     Users,
-    User,
     Package,
     Folder,
     Tag,
     Share2,
     Settings,
     Mail,
-    Image,
+    Image as ImageIcon,
     Home,
-    LogOut
+    LogOut,
+    ShoppingBag,
+    Bell
 } from "lucide-react"
 
 import Link from "next/link"
@@ -31,54 +32,62 @@ export default function Sidebar() {
     const pathname = usePathname()
 
     const menuItems = [
-        { icon: LayoutGrid, label: "Dashboard", href: "/dashboard" },
-        { icon: Users, label: "Clientes", href: "/dashboard/clients" },
-        { icon: User, label: "Equipe", href: "/dashboard/team" },
-        { icon: Package, label: "Produtos", href: "/dashboard/products" },
-        { icon: Folder, label: "Categorias", href: "/dashboard/categories" },
-        { icon: Tag, label: "Marcas", href: "/dashboard/brands" },
-        { icon: Share2, label: "Redes Sociais", href: "/dashboard/socials" },
-        { icon: Settings, label: "Configurações", href: "/dashboard/settings" },
-        { icon: Mail, label: "Newsletter", href: "/dashboard/newsletter" },
-        { icon: Image, label: "Banners", href: "/dashboard/banners" },
+        { icon: LayoutGrid, label: "Início", href: "/admin" },
+        { icon: ShoppingBag, label: "Produtos", href: "/admin/products" },
+        { icon: Folder, label: "Categorias", href: "/admin/categories" },
+        { icon: Tag, label: "Marcas", href: "/admin/brands" },
+        { icon: Users, label: "Clientes", href: "/admin/clients" },
+        { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
+        { icon: ImageIcon, label: "Banners", href: "/admin/banners" },
+        { icon: Share2, label: "Canais", href: "/admin/channels" },
+        { icon: Bell, label: "Notificações", href: "/admin/notifications" },
+        { icon: Settings, label: "Configurações", href: "/admin/settings" },
     ]
 
     return (
         <Sheet>
             <SheetTrigger asChild>
                 <button
-                    className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="p-2.5 rounded-xl hover:bg-slate-800/80 transition-all duration-300 border border-slate-700/50 group cursor-pointer"
                     aria-label="Abrir menu"
                 >
-                    <Menu className="w-6 h-6 text-slate-300" />
+                    <Menu className="w-5 h-5 text-slate-300 group-hover:text-white group-hover:scale-110 transition-transform" />
                 </button>
             </SheetTrigger>
 
             <SheetContent
                 side="left"
-                className="w-64 bg-slate-900 border-r border-slate-700/50 p-0 flex flex-col"
+                className="w-72 bg-slate-900 border-r border-slate-800 p-0 flex flex-col shadow-2xl"
             >
-                <SheetHeader className="p-6 border-b border-slate-700/50">
-                    <SheetTitle className="sr-only">Menu</SheetTitle>
+                <div className="absolute inset-0 bg-linear-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none" />
 
-                    <Link href="/dashboard" className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-white">
-                            <Home className="w-5 h-5" />
+                <SheetHeader className="p-8 border-b border-slate-800/80 relative">
+                    <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
+
+                    <Link href="/admin" className="flex items-center gap-4 group">
+                        <div className="w-12 h-12 bg-linear-to-tr from-slate-800 to-slate-700 border border-slate-600/50 rounded-2xl flex items-center justify-center text-white shadow-xl group-hover:border-blue-500/50 transition-colors">
+                            <ShoppingBag className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform" />
                         </div>
 
-                        <div>
-                            <span className="block text-lg font-semibold text-white">
-                                Admin
+                        <div className="flex flex-col">
+                            <span className="text-xl font-bold text-white tracking-tight">
+                                Painel Admin
                             </span>
-                            <span className="block text-xs text-slate-400">
-                                Painel de Controle
+                            <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">
+                                Sistema de Gestão
                             </span>
                         </div>
                     </Link>
                 </SheetHeader>
 
-                <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                    {menuItems.map(item => {
+                <nav className="flex-1 p-5 space-y-1.5 overflow-y-auto relative custom-scrollbar">
+                    <div className="pb-4">
+                        <p className="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+                            Principal
+                        </p>
+                    </div>
+
+                    {menuItems.map((item, index) => {
                         const Icon = item.icon
                         const active = pathname === item.href
 
@@ -86,37 +95,41 @@ export default function Sidebar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group
+                                className={`flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all duration-300 group relative
                   ${active
-                                        ? "bg-slate-800 text-white shadow-lg"
-                                        : "text-slate-400 hover:text-white hover:bg-slate-800"
+                                        ? "bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-[0_0_20px_rgba(37,99,235,0.05)]"
+                                        : "text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent"
                                     }`}
                             >
-                                <Icon className="w-5 h-5" />
-                                <span className="font-medium">{item.label}</span>
+                                {active && (
+                                    <div className="absolute left-0 w-1 h-6 bg-blue-500 rounded-r-full shadow-[0_0_10px_rgba(37,99,235,0.5)]" />
+                                )}
+                                <Icon className={`w-5 h-5 transition-colors ${active ? "text-blue-400" : "group-hover:text-blue-400"}`} />
+                                <span className="font-semibold text-[15px]">{item.label}</span>
                             </Link>
                         )
                     })}
                 </nav>
 
-                <div className="p-4 border-t border-slate-700/50 space-y-1">
+                <div className="p-6 border-t border-slate-800/80 bg-slate-900/50 backdrop-blur-md relative">
                     <Link
                         href="/"
-                        className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+                        className="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800/80 rounded-xl transition-all border border-transparent hover:border-slate-700"
                     >
                         <Home className="w-5 h-5" />
-                        <span className="font-medium">Ver Loja</span>
+                        <span className="font-semibold text-[15px]">Visualizar Loja</span>
                     </Link>
 
                     <button
                         type="button"
-                        className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-all"
+                        className="w-full mt-2 flex items-center gap-3.5 px-4 py-3 text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 rounded-xl transition-all border border-transparent hover:border-rose-500/10 group"
                     >
-                        <LogOut className="w-5 h-5" />
-                        <span className="font-medium">Sair</span>
+                        <LogOut className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                        <span className="font-semibold text-[15px]">Encerrar Sessão</span>
                     </button>
                 </div>
             </SheetContent>
         </Sheet>
     )
 }
+

@@ -4,20 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { ReactNode } from "react";
 import {
     Menu,
     X,
     Home,
     Layers,
-    Phone,
-    Instagram,
-    Facebook,
-    Twitter,
-    Youtube,
-    Linkedin,
-    MessageCircle,
-    Music,
-    Store
+    Phone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchHeader from "./searchHeader";
@@ -30,11 +23,13 @@ import {
     SheetDescription
 } from "@/components/ui/sheet";
 
-interface HeaderProps {
-    config: any;
+interface HeaderShellProps {
+    brandSlot: ReactNode;
+    menuBrandSlot: ReactNode;
+    socialSlot: ReactNode;
 }
 
-export default function HeaderMobile({ config }: HeaderProps) {
+export default function HeaderMobile({ brandSlot, menuBrandSlot, socialSlot }: HeaderShellProps) {
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const pathname = usePathname();
 
@@ -46,25 +41,6 @@ export default function HeaderMobile({ config }: HeaderProps) {
         console.log("Searching for:", term);
     };
 
-    const socialIcons: Record<string, any> = {
-        instagram: Instagram,
-        facebook: Facebook,
-        twitter: Twitter,
-        x: X,
-        youtube: Youtube,
-        linkedin: Linkedin,
-        tiktok: Music,
-        whatsapp: MessageCircle,
-    };
-
-    const getSocialIcon = (platform: string) => {
-        const lowerPlatform = platform.toLowerCase();
-        for (const key in socialIcons) {
-            if (lowerPlatform.includes(key)) return socialIcons[key];
-        }
-        return null;
-    };
-
     return (
         <header className="fixed top-0 left-0 z-50 w-full transition-all duration-400 bg-white lg:hidden">
             <div className="bg-white/95 backdrop-blur-sm border-b border-slate-100 shadow-sm relative z-40 overflow-hidden">
@@ -73,27 +49,7 @@ export default function HeaderMobile({ config }: HeaderProps) {
                         "flex items-center justify-between h-full gap-6 transition-all duration-300",
                         isMobileSearchOpen && "opacity-0 pointer-events-none"
                     )}>
-                        <Link href="/" className="flex items-center gap-3 shrink-0 group">
-                            <div className="w-13 h-13 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                                {config?.logoUrl && config.logoUrl !== "null" ? (
-                                    <Image src={config.logoUrl} width={52} height={43} alt="Logo" priority className="rounded-full object-contain" />
-                                ) : (
-                                    <div className="w-13 h-13 flex items-center justify-center bg-pink-100 rounded-full text-pink-700 shadow-inner">
-                                        <Store className="w-7 h-7" />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-2xl font-bold text-pink-700 leading-tight">
-                                    {config?.storeName || 'Elegance'}
-                                </span>
-                                <div className="flex items-center gap-2 -mt-0.5">
-                                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider line-clamp-1 opacity-80">
-                                        {config?.city && config?.state ? `${config.city} - ${config.state}` : 'Barra do Quarai'}
-                                    </span>
-                                </div>
-                            </div>
-                        </Link>
+                        {brandSlot}
 
                         <div className="flex items-center gap-1">
                             <button
@@ -113,29 +69,11 @@ export default function HeaderMobile({ config }: HeaderProps) {
                                     </button>
                                 </SheetTrigger>
                                 <SheetContent side="right" className="p-0 border-none w-[320px] max-w-[85vw]">
-                                    <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
-                                    <SheetDescription className="sr-only">Acesso rápido para produtos, categorias e contato</SheetDescription>
+                                    <SheetTitle className="sr-only text-white">Menu de Navegação</SheetTitle>
+                                    <SheetDescription className="sr-only text-white/80">Acesso rápido para produtos, categorias e contato</SheetDescription>
                                     <div className="flex flex-col h-full bg-slate-50 overflow-y-auto">
                                         <div className="flex items-center justify-between p-6 bg-linear-to-r from-pink-600 to-pink-700 text-white shadow-lg sticky top-0 z-10">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md flex items-center justify-center rounded-2xl overflow-hidden">
-                                                    {config?.logoUrl && config.logoUrl !== "null" ? (
-                                                        <Image src={config.logoUrl} width={42} height={34} alt="Logo" className="rounded-lg object-contain brightness-110" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center bg-white/10">
-                                                            <Store className="w-6 h-6 text-white opacity-80" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold uppercase tracking-widest text-sm leading-tight">
-                                                        {config?.storeName || 'Bazar Elegance'}
-                                                    </span>
-                                                    <span className="text-[10px] text-pink-100 font-medium opacity-80 uppercase tracking-tighter">
-                                                        Menu de Navegação
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            {menuBrandSlot}
                                             <SheetClose className="absolute right-4 top-6 p-2.5 bg-white/10 hover:bg-white/20 active:scale-90 rounded-xl transition-all border-none outline-none">
                                                 <X className="w-6 h-6 text-white" />
                                             </SheetClose>
@@ -164,29 +102,7 @@ export default function HeaderMobile({ config }: HeaderProps) {
                                             ))}
                                         </nav>
 
-                                        {config?.socialMedias?.length > 0 && (
-                                            <div className="p-8 border-t border-slate-200 mt-auto bg-white/80 backdrop-blur-sm">
-                                                <p className="text-[10px] text-pink-700/60 uppercase tracking-widest font-bold mb-6 text-center">
-                                                    Conecte-se conosco
-                                                </p>
-                                                <div className="flex items-center justify-center gap-5">
-                                                    {config.socialMedias.map((social: any) => {
-                                                        const Icon = getSocialIcon(social.platform);
-                                                        return Icon && (
-                                                            <a
-                                                                key={social.id}
-                                                                href={social.url}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="w-14 h-14 bg-pink-50 text-pink-700 flex items-center justify-center rounded-2xl shadow-sm hover:shadow-md hover:scale-110 active:scale-95 transition-all border border-pink-100"
-                                                            >
-                                                                <Icon className="w-6 h-6" />
-                                                            </a>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        )}
+                                        {socialSlot}
                                     </div>
                                 </SheetContent>
                             </Sheet>

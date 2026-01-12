@@ -6,9 +6,9 @@ const publicRoutes = [
     { path: "/login", type: "redirect" },
     { path: "/reset-password", type: "redirect" },
     { path: "/sobre", type: "next" },
-    { path: "/termos-de-uso", type: "next" },
-    { path: "/politica-de-cookies", type: "next" },
-    { path: "/politica-de-privacidade", type: "next" },
+    { path: "/termos", type: "next" },
+    { path: "/cookies", type: "next" },
+    { path: "/privacidade", type: "next" },
     { path: "/nossos-filhotes", type: "next" },
     { path: "/recuperar-senha", type: "next" },
 ] as const;

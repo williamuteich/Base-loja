@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-    Save, Store, Mail, Globe, MapPin,
-    Power, Search, CheckCircle2, AlertCircle, Loader2,
-    ShieldCheck
+    Save, Store, Mail, MapPin, Search, Loader2
 } from "lucide-react";
 import { getSettings, updateSettings } from "@/services/settings";
 import { toast } from "sonner";
@@ -44,7 +42,6 @@ export default function SettingsPage() {
                 if (data) {
                     setFormData({
                         ...data,
-                        // Ensure optional fields are strings
                         maintenanceMessage: data.maintenanceMessage || "",
                         description: data.description || "",
                         phone: data.phone || "",
@@ -96,12 +93,8 @@ export default function SettingsPage() {
         }
         if (v.length > 9) {
             v = `${v.substring(0, 10)}-${v.substring(10)}`;
-        } else if (v.length > 6 && v.length <= 9) {
-            // This is for 8 digits: (11) 3333-4444
-            // But usually we handle it dynamically
         }
 
-        // Better Phone Mask:
         v = value.replace(/\D/g, "");
         if (v.length <= 10) {
             v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
@@ -170,47 +163,6 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* Controle do Site */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-200 flex items-center gap-3 bg-slate-900 text-white">
-                    <div className="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center">
-                        <Power className="w-5 h-5 text-rose-400" />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-semibold">Controle do Site</h2>
-                        <p className="text-sm text-slate-400">Status e manutenção</p>
-                    </div>
-                </div>
-                <div className="p-6 space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                        <div>
-                            <label className="text-sm font-bold text-slate-700 block mb-1">Modo Manutenção</label>
-                            <p className="text-sm text-slate-500">Exibe uma tela de manutenção para os visitantes</p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => toggleSwitch('maintenanceMode')}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formData.maintenanceMode ? 'bg-amber-500' : 'bg-slate-300'}`}
-                        >
-                            <span className={`${formData.maintenanceMode ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`} />
-                        </button>
-                    </div>
-                    {formData.maintenanceMode && (
-                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <label className="text-sm font-semibold text-slate-700">Mensagem de Manutenção</label>
-                            <textarea
-                                name="maintenanceMessage"
-                                value={formData.maintenanceMessage}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition-all min-h-[100px]"
-                                placeholder="Estamos em manutenção..."
-                            />
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Informações da Loja */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-200 flex items-center gap-3 bg-slate-900 text-white">
                     <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
@@ -323,7 +275,6 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* Configurações de Email */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-200 flex items-center gap-3 bg-slate-900 text-white">
                     <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
@@ -374,7 +325,6 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* SEO */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-200 flex items-center gap-3 bg-slate-900 text-white">
                     <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
@@ -420,7 +370,6 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* Localização & Horários */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-200 flex items-center gap-3 bg-slate-900 text-white">
                     <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">

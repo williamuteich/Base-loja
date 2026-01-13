@@ -35,7 +35,6 @@ export default function Sidebar() {
         { icon: ShoppingBag, label: "Produtos", href: "/admin/products" },
         { icon: Folder, label: "Categorias", href: "/admin/categories" },
         { icon: Tag, label: "Marcas", href: "/admin/brands" },
-        { icon: Users, label: "Clientes", href: "/admin/clients" },
         { icon: ShieldCheck, label: "Equipe", href: "/admin/team" },
         { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
         { icon: ImageIcon, label: "Banners", href: "/admin/banners" },

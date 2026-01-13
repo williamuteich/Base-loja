@@ -11,6 +11,15 @@ export interface Product {
     categories: ProductCategory[];
     brand?: Brand;
     brandId?: string;
+    variants?: ProductVariant[];
+}
+
+export interface ProductVariant {
+    id: string;
+    name: string;
+    color: string;
+    quantity: number;
+    productId: string;
 }
 
 export interface ProductImage {

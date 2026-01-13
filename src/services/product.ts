@@ -61,3 +61,59 @@ export async function getAdminProducts(page: number = 1, limit: number = 10, sea
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
     }
 }
+
+export async function createProduct(formData: FormData): Promise<Product | null> {
+    try {
+        const res = await fetch(`${API_URL}/api/private/product`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || "Failed to create product");
+        }
+
+        return await res.json();
+    } catch (error: any) {
+        console.error("[Service Product] createProduct Error:", error);
+        throw new Error(error.message || "Failed to create product");
+    }
+}
+
+export async function updateProduct(id: string, formData: FormData): Promise<Product | null> {
+    try {
+        const res = await fetch(`${API_URL}/api/private/product/${id}`, {
+            method: "PATCH",
+            body: formData,
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || "Failed to update product");
+        }
+
+        return await res.json();
+    } catch (error: any) {
+        console.error("[Service Product] updateProduct Error:", error);
+        throw new Error(error.message || "Failed to update product");
+    }
+}
+
+export async function deleteProduct(id: string): Promise<boolean> {
+    try {
+        const res = await fetch(`${API_URL}/api/private/product/${id}`, {
+            method: "DELETE",
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || "Failed to delete product");
+        }
+
+        return true;
+    } catch (error: any) {
+        console.error("[Service Product] deleteProduct Error:", error);
+        throw new Error(error.message || "Failed to delete product");
+    }
+}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cacheTag, cacheLife } from "next/cache";
+import { connection } from "next/server";
 
 async function getCachedCategories(skip: number, take: number, homeOnly: boolean) {
     "use cache";
@@ -29,6 +30,7 @@ async function getCachedCategories(skip: number, take: number, homeOnly: boolean
 }
 
 export async function GET(req: NextRequest) {
+    await connection();
     try {
         const { searchParams } = new URL(req.url);
         const homeOnly = searchParams.get("home") === "true";

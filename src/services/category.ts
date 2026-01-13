@@ -5,13 +5,14 @@ import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
-export async function getPublicCategories(homeOnly: boolean = false): Promise<Category[]> {
+export async function getPublicCategories(homeOnly: boolean = false, includeProducts: boolean = false): Promise<Category[]> {
     "use cache";
     cacheTag("categories");
+    if (includeProducts) cacheTag("products");
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/api/public/category?home=${homeOnly}`);
+        const res = await fetch(`${API_URL}/api/public/category?home=${homeOnly}&includeProducts=${includeProducts}`);
         if (!res.ok) throw new Error("Failed to fetch categories");
         return await res.json();
     } catch (error) {

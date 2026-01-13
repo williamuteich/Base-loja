@@ -27,7 +27,7 @@ export default function ProductCarousel({ products, backendUrl }: ProductCarouse
 
                 <ProductCarouselWrapper hasProducts={products.length > 0}>
                     {products.map((product) => (
-                        <div key={product.id} className="min-w-[75%] md:min-w-[45%] lg:min-w-[30%] xl:min-w-[23%] snap-start">
+                        <div key={product.id} className="w-[45%] md:w-[30%] lg:w-[22%] xl:w-[18%] snap-start shrink-0">
                             <ProductCard
                                 product={product}
                                 backendUrl={backendUrl}

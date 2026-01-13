@@ -2,6 +2,7 @@
 
 import { Brand } from "@/types/brand";
 import { cacheTag, cacheLife } from "next/cache";
+import { prisma } from "@/lib/prisma";
 
 export interface BrandsResponse {
     data: Brand[];
@@ -21,9 +22,16 @@ export async function getPublicBrands(): Promise<Brand[]> {
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/api/public/brand`);
-        if (!res.ok) throw new Error("Falha ao buscar marcas públicas");
-        return await res.json();
+        const brandsRaw = await prisma.brand.findMany({
+            where: { isActive: true },
+            orderBy: { name: 'asc' }
+        });
+
+        return brandsRaw.map(brand => ({
+            ...brand,
+            createdAt: brand.createdAt.toISOString(),
+            updatedAt: brand.updatedAt.toISOString(),
+        }));
     } catch (error) {
         console.error("[Service Brand] getPublicBrands Error:", error);
         return [];
@@ -32,14 +40,38 @@ export async function getPublicBrands(): Promise<Brand[]> {
 
 export async function getAdminBrands(page: number = 1, limit: number = 10, search: string = ""): Promise<BrandsResponse> {
     try {
-        const url = new URL(`${API_URL}/api/private/brand`);
-        url.searchParams.set("page", page.toString());
-        url.searchParams.set("limit", limit.toString());
-        if (search) url.searchParams.set("search", search);
+        const skip = (page - 1) * limit;
+        const where: any = {};
 
-        const res = await fetch(url.toString(), { cache: "no-store" });
-        if (!res.ok) throw new Error("Falha ao buscar marcas");
-        return await res.json();
+        if (search) {
+            where.name = { contains: search };
+        }
+
+        const [data, total] = await Promise.all([
+            prisma.brand.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { name: 'asc' }
+            }),
+            prisma.brand.count({ where })
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: data.map(brand => ({
+                ...brand,
+                createdAt: brand.createdAt.toISOString(),
+                updatedAt: brand.updatedAt.toISOString(),
+            })),
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages
+            }
+        };
     } catch (error) {
         console.error("[Service Brand] getAdminBrands Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };

@@ -84,7 +84,6 @@ const quickActions = [
 export default function AdminPage() {
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Welcome Banner */}
             <div className="relative overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-blue-900 rounded-3xl p-8 md:p-12 shadow-2xl shadow-blue-900/10">
                 <div className="absolute top-0 right-0 -m-12 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 -m-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
@@ -117,7 +116,6 @@ export default function AdminPage() {
                 </div>
             </div>
 
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat) => {
                     const Icon = stat.icon
@@ -147,7 +145,6 @@ export default function AdminPage() {
                 })}
             </div>
 
-            {/* Quick Actions & Maintenance */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
                     <Card className="border-slate-200/60 bg-white">

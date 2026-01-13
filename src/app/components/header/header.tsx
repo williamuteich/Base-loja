@@ -8,7 +8,7 @@ import SeoMessage from "./components/seo-message";
 
 export default function Header() {
     return (
-        <>
+        <Suspense fallback={<div className="h-[116px] w-full bg-white border-b border-slate-100 animate-pulse" />}>
             <HeaderDesk
                 brandSlot={
                     <Suspense fallback={<div className="w-48 h-10 bg-slate-100 animate-pulse rounded-lg" />}>
@@ -49,6 +49,6 @@ export default function Header() {
                     </Suspense>
                 }
             />
-        </>
+        </Suspense>
     );
 }

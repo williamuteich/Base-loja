@@ -1,8 +1,10 @@
 import { getAdminBrands } from "@/services/brand";
-import { getAdminCategories } from "@/services/category";
 import ProductForm from "../components/product-form";
+import { connection } from "next/server";
+import { getAdminCategories } from "@/services/category";
 
 export default async function CreateProductPage() {
+    await connection();
     const brandsData = await getAdminBrands(1, 100);
     const categoriesData = await getAdminCategories(1, 100);
 

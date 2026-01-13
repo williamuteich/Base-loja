@@ -5,10 +5,12 @@ import ProductCarousel from "./components/home/products/product-carousel";
 import CategoryProductsCarousel from "./components/home/products/category-products-carousel";
 import { getPublicProducts } from "@/services/product";
 import { getPublicCategories } from "@/services/category";
+import { connection } from "next/server";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export default async function Home() {
+  await connection();
   const products = await getPublicProducts();
   const homeCategories = await getPublicCategories(true, true);
 

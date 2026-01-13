@@ -182,7 +182,6 @@ export default function SocialMediaList() {
                 </div>
             </div>
 
-            {/* Add Modal */}
             <GenericModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
@@ -230,7 +229,6 @@ export default function SocialMediaList() {
                 </div>
             </GenericModal>
 
-            {/* Delete Modal */}
             <GenericModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}

@@ -1,5 +1,6 @@
+import { prisma } from "@/lib/prisma";
 import { StoreConfig } from "@/types/store-config";
-import { cacheTag, cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -9,15 +10,26 @@ export async function getStoreConfig(): Promise<StoreConfig | null> {
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/api/public/store-configuration`);
+        const configRaw = await prisma.storeConfiguration.findFirst({
+            include: {
+                socialMedias: {
+                    where: { isActive: true }
+                }
+            }
+        });
 
-        if (!res.ok) {
-            console.warn(`Fetch to ${API_URL}/store-configuration/public returned status: ${res.status}`);
-            return null;
-        }
+        if (!configRaw) return null;
 
-        const data = await res.json();
-        return data;
+        return {
+            ...configRaw,
+            createdAt: configRaw.createdAt.toISOString(),
+            updatedAt: configRaw.updatedAt.toISOString(),
+            socialMedias: configRaw.socialMedias.map(sm => ({
+                ...sm,
+                createdAt: sm.createdAt.toISOString(),
+                updatedAt: sm.updatedAt.toISOString(),
+            }))
+        } as any;
     } catch (error) {
         console.error("Error fetching store config:", error);
         return null;

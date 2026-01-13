@@ -2,6 +2,7 @@
 
 import { Product } from "@/types/product";
 import { cacheTag, cacheLife } from "next/cache";
+import { prisma } from "@/lib/prisma";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -10,28 +11,44 @@ export async function getPublicProducts(): Promise<Product[]> {
     cacheTag("products");
     cacheLife("hours");
 
-    const endpoint = `${API_URL}/api/public/product`;
-
     try {
-        const res = await fetch(endpoint);
+        const productsRaw = await prisma.product.findMany({
+            where: { isActive: true },
+            include: {
+                images: true,
+                categories: {
+                    include: { category: true }
+                },
+                brand: true
+            },
+            orderBy: { createdAt: 'desc' }
+        });
 
-        if (!res.ok) {
-            console.error(`[API Error] GET ${endpoint} failed with status: ${res.status}`);
-            return [];
-        }
-
-        const responseData = await res.json();
-
-        let products: Product[] = [];
-        if (Array.isArray(responseData)) {
-            products = responseData;
-        } else if (responseData && Array.isArray(responseData.data)) {
-            products = responseData.data;
-        }
-
-        return products;
+        // Map Prisma Date to string to match Product interface
+        return productsRaw.map(product => ({
+            ...product,
+            createdAt: product.createdAt?.toISOString() || new Date().toISOString(),
+            images: product.images?.map(img => ({
+                ...img,
+                createdAt: img.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: img.updatedAt?.toISOString() || new Date().toISOString(),
+            })) || [],
+            categories: product.categories?.map(cat => ({
+                ...cat,
+                category: cat.category ? {
+                    ...cat.category,
+                    createdAt: cat.category.createdAt?.toISOString() || new Date().toISOString(),
+                    updatedAt: cat.category.updatedAt?.toISOString() || new Date().toISOString(),
+                } : { name: "N/A", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+            })) || [],
+            brand: product.brand ? {
+                ...product.brand,
+                createdAt: product.brand.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: product.brand.updatedAt?.toISOString() || new Date().toISOString(),
+            } : undefined
+        })) as any;
     } catch (error) {
-        console.error(`[API Exception] GET ${endpoint}:`, error);
+        console.error(`[Service Product] getPublicProducts Error:`, error);
         return [];
     }
 }

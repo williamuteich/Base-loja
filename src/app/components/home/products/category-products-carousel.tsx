@@ -134,7 +134,7 @@ export default function CategoryProductsCarousel({
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         {activeProducts.map((product) => (
-                            <div key={product.id} className="min-w-[46%] md:min-w-[40%] lg:min-w-[28%] xl:min-w-[22%] shrink-0">
+                            <div key={product.id} className="min-w-[45%] md:min-w-[30%] lg:min-w-[22%] xl:min-w-[18%] shrink-0">
                                 <Link
                                     href={`/product/${product.id}`}
                                     className="group block bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-slate-200 transition-all duration-500 h-full hover:shadow-lg"

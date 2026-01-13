@@ -2,6 +2,7 @@
 
 import { Banner } from "@/types/banner";
 import { cacheTag, cacheLife } from "next/cache";
+import { prisma } from "@/lib/prisma";
 
 export interface BannersResponse {
     data: Banner[];
@@ -21,10 +22,16 @@ export async function getPublicBanners(): Promise<Banner[]> {
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/api/public/banner`);
+        const bannersRaw = await prisma.banner.findMany({
+            where: { isActive: true },
+            orderBy: { createdAt: 'desc' }
+        });
 
-        if (!res.ok) throw new Error("Failed to fetch public banners");
-        return await res.json();
+        return bannersRaw.map(banner => ({
+            ...banner,
+            createdAt: banner.createdAt.toISOString(),
+            updatedAt: banner.updatedAt.toISOString(),
+        }));
     } catch (error) {
         console.error("Error fetching public banners:", error);
         return [];

@@ -1,3 +1,5 @@
+"use server";
+
 import { Product } from "@/types/product";
 import { cacheTag, cacheLife } from "next/cache";
 
@@ -31,5 +33,31 @@ export async function getPublicProducts(): Promise<Product[]> {
     } catch (error) {
         console.error(`[API Exception] GET ${endpoint}:`, error);
         return [];
+    }
+}
+
+export interface ProductsResponse {
+    data: Product[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+export async function getAdminProducts(page: number = 1, limit: number = 10, search: string = ""): Promise<ProductsResponse> {
+    try {
+        const url = new URL(`${API_URL}/api/private/product`);
+        url.searchParams.set("page", page.toString());
+        url.searchParams.set("limit", limit.toString());
+        if (search) url.searchParams.set("search", search);
+
+        const res = await fetch(url.toString(), { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch admin products");
+        return await res.json();
+    } catch (error) {
+        console.error("[Service Product] getAdminProducts Error:", error);
+        return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
     }
 }

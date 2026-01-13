@@ -8,7 +8,7 @@ export async function getPublicProducts(): Promise<Product[]> {
     cacheTag("products");
     cacheLife("hours");
 
-    const endpoint = `${API_URL}/product/public`;
+    const endpoint = `${API_URL}/api/public/product`;
 
     try {
         const res = await fetch(endpoint);

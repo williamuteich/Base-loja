@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        revalidateTag("brands", "max");
+        revalidateTag("brands", { expire: 10 });
 
         return NextResponse.json(brand, { status: 201 });
     } catch (error) {

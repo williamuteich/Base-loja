@@ -46,7 +46,7 @@ export async function PATCH(request: NextRequest) {
             },
         });
 
-        revalidateTag("store-config", "max");
+        revalidateTag("store-config", { expire: 10 });
 
         return NextResponse.json(updatedConfig);
     } catch (error) {

@@ -45,7 +45,7 @@ export async function PATCH(
             }
         });
 
-        revalidateTag("team", "max");
+        revalidateTag("team", { expire: 10 });
 
         return NextResponse.json(member);
     } catch (error) {
@@ -76,7 +76,7 @@ export async function DELETE(
             where: { id },
         });
 
-        revalidateTag("team", "max");
+        revalidateTag("team", { expire: 0 });
 
         return NextResponse.json({ message: "Membro da equipe removido com sucesso" });
     } catch (error) {

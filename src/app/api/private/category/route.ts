@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        revalidateTag("categories", "max");
+        revalidateTag("categories", { expire: 10 });
 
         return NextResponse.json(category, { status: 201 });
     } catch (error: any) {

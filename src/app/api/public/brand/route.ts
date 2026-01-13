@@ -1,17 +1,25 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cacheTag, cacheLife } from "next/cache";
+
+async function getCachedBrands() {
+    "use cache";
+    cacheTag("brands");
+    cacheLife("hours");
+
+    return await prisma.brand.findMany({
+        where: {
+            isActive: true,
+        },
+        orderBy: {
+            name: "asc",
+        },
+    });
+}
 
 export async function GET() {
     try {
-        const brands = await prisma.brand.findMany({
-            where: {
-                isActive: true,
-            },
-            orderBy: {
-                name: "asc",
-            },
-        });
-
+        const brands = await getCachedBrands();
         return NextResponse.json(brands);
     } catch (error) {
         console.error("[API Public Brand] GET Error:", error);

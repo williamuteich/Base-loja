@@ -39,7 +39,7 @@ export async function PATCH(
             },
         });
 
-        revalidateTag("brands", "max");
+        revalidateTag("brands", { expire: 10 });
 
         return NextResponse.json(brand);
     } catch (error) {
@@ -82,7 +82,7 @@ export async function DELETE(
             where: { id },
         });
 
-        revalidateTag("brands", "max");
+        revalidateTag("brands", { expire: 10 });
 
         return NextResponse.json({ message: "Marca removida com sucesso" });
     } catch (error) {

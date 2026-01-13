@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        revalidateTag("store-config", "max");
+        revalidateTag("store-config", { expire: 10 });
 
         return NextResponse.json(socialMedia, { status: 201 });
 

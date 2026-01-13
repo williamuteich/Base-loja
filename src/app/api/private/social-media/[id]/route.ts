@@ -20,7 +20,7 @@ export async function PATCH(
             },
         });
 
-        revalidateTag("store-config", "max");
+        revalidateTag("store-config", { expire: 10 });
 
         return NextResponse.json(socialMedia);
 
@@ -50,7 +50,7 @@ export async function DELETE(
             where: { id },
         });
 
-        revalidateTag("store-config", "max");
+        revalidateTag("store-config", { expire: 0 });
 
         return NextResponse.json({ message: "Social media deleted successfully" });
 

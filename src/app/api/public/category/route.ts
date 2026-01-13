@@ -1,5 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cacheTag, cacheLife } from "next/cache";
+
+async function getCachedCategories(skip: number, take: number, homeOnly: boolean) {
+    "use cache";
+    cacheTag("categories");
+    cacheLife("hours");
+
+    const where: any = {
+        isActive: true,
+    };
+
+    if (homeOnly) {
+        where.isHome = true;
+    }
+
+    return await prisma.category.findMany({
+        where,
+        include: {
+            _count: {
+                select: { products: true }
+            }
+        },
+        skip,
+        take,
+        orderBy: { name: 'asc' }
+    });
+}
 
 export async function GET(req: NextRequest) {
     try {
@@ -8,25 +35,7 @@ export async function GET(req: NextRequest) {
         const skip = parseInt(searchParams.get("skip") || "0");
         const take = parseInt(searchParams.get("take") || "10");
 
-        const where: any = {
-            isActive: true,
-        };
-
-        if (homeOnly) {
-            where.isHome = true;
-        }
-
-        const categories = await prisma.category.findMany({
-            where,
-            include: {
-                _count: {
-                    select: { products: true }
-                }
-            },
-            skip,
-            take,
-            orderBy: { name: 'asc' }
-        });
+        const categories = await getCachedCategories(skip, take, homeOnly);
 
         return NextResponse.json(categories);
     } catch (error) {

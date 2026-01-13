@@ -42,7 +42,7 @@ export default async function StoreBrand({ mobile = false, onPink = false }: { m
                 </span>
                 <div className="flex items-center gap-2 -mt-0.5">
                     <span className={subClasses}>
-                        {config?.city && config?.state ? `${config.city} - ${config.state}` : 'Barra do Quarai'}
+                        {config?.description || 'Joias Exclusivas'}
                     </span>
                 </div>
             </div>

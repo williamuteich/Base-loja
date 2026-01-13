@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
             }
         });
 
-        revalidateTag("team", "max");
+        revalidateTag("team", { expire: 10 });
 
         return NextResponse.json(member, { status: 201 });
 

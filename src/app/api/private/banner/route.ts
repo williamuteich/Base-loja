@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        revalidateTag("banners", "max");
+        revalidateTag("banners", { expire: 10 });
 
         return NextResponse.json(banner, { status: 201 });
 

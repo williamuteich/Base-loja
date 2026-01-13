@@ -39,7 +39,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             }
         });
 
-        revalidateTag("categories", "max");
+        revalidateTag("categories", { expire: 10 });
 
         return NextResponse.json(category);
     } catch (error: any) {
@@ -82,7 +82,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
             where: { id }
         });
 
-        revalidateTag("categories", "max");
+        revalidateTag("categories", { expire: 0 });
 
         return NextResponse.json({ message: "Category deleted successfully" });
     } catch (error) {

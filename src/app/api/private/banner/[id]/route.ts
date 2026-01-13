@@ -56,7 +56,7 @@ export async function PATCH(
             data,
         });
 
-        revalidateTag("banners", "max");
+        revalidateTag("banners", { expire: 10 });
 
         return NextResponse.json(banner);
     } catch (error) {
@@ -95,7 +95,7 @@ export async function DELETE(
             where: { id },
         });
 
-        revalidateTag("banners", "max");
+        revalidateTag("banners", { expire: 10 });
 
         return NextResponse.json({ message: "Banner deleted successfully" });
     } catch (error) {

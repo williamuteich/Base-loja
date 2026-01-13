@@ -19,7 +19,8 @@ import {
     Image as ImageIcon,
     Home,
     ShoppingBag,
-    ShieldCheck
+    ShieldCheck,
+    Globe
 } from "lucide-react"
 
 import Link from "next/link"
@@ -38,6 +39,7 @@ export default function Sidebar() {
         { icon: ShieldCheck, label: "Equipe", href: "/admin/team" },
         { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
         { icon: ImageIcon, label: "Banners", href: "/admin/banners" },
+        { icon: Globe, label: "Redes Sociais", href: "/admin/social-medias" },
         { icon: Settings, label: "Configurações", href: "/admin/settings" },
     ]
 

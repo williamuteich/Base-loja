@@ -9,7 +9,7 @@ export async function getStoreConfig(): Promise<StoreConfig | null> {
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/store-configuration/public`);
+        const res = await fetch(`${API_URL}/api/public/store-configuration`);
 
         if (!res.ok) {
             console.warn(`Fetch to ${API_URL}/store-configuration/public returned status: ${res.status}`);

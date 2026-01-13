@@ -82,6 +82,17 @@ export default function ProductForm({ product, brands, categories }: ProductForm
                 setVariants([{ name: "Padrão", color: "#000000", quantity: "0" }]);
             }
         } else {
+            setTitle("");
+            setDescription("");
+            setPrice("");
+            setDiscountPrice("");
+            setBrandId("");
+            setIsActive(true);
+            setSpecs("");
+            setSelectedCategoryIds([]);
+            setKeptImageUrls([]);
+            setSelectedFiles([]);
+            setPreviewUrls([]);
             setVariants([{ name: "Padrão", color: "#000000", quantity: "0" }]);
         }
     }, [product]);

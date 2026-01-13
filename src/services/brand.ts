@@ -1,6 +1,7 @@
 "use server";
 
 import { Brand } from "@/types/brand";
+import { cacheTag, cacheLife } from "next/cache";
 
 export interface BrandsResponse {
     data: Brand[];
@@ -15,10 +16,12 @@ export interface BrandsResponse {
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicBrands(): Promise<Brand[]> {
+    "use cache";
+    cacheTag("brands");
+    cacheLife("hours");
+
     try {
-        const res = await fetch(`${API_URL}/api/public/brand`, {
-            next: { revalidate: 3600 }
-        });
+        const res = await fetch(`${API_URL}/api/public/brand`);
         if (!res.ok) throw new Error("Falha ao buscar marcas públicas");
         return await res.json();
     } catch (error) {

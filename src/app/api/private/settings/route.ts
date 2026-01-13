@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateStoreConfig } from "@/lib/store-config";
+import { revalidateTag } from "next/cache";
 
 export async function GET() {
     try {
@@ -44,6 +45,8 @@ export async function PATCH(request: NextRequest) {
                 seoKeywords: body.seoKeywords,
             },
         });
+
+        revalidateTag("store-config", "max");
 
         return NextResponse.json(updatedConfig);
     } catch (error) {

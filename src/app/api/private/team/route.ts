@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { revalidateTag } from "next/cache";
 
 const PAGE_SIZE = 10;
 
@@ -103,6 +104,8 @@ export async function POST(request: NextRequest) {
                 updatedAt: true
             }
         });
+
+        revalidateTag("team", "max");
 
         return NextResponse.json(member, { status: 201 });
 

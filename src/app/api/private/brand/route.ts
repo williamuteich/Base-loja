@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -79,6 +80,8 @@ export async function POST(request: NextRequest) {
                 isActive: data.isActive !== undefined ? data.isActive : true,
             },
         });
+
+        revalidateTag("brands", "max");
 
         return NextResponse.json(brand, { status: 201 });
     } catch (error) {

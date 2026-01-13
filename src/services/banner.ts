@@ -1,6 +1,7 @@
 "use server";
 
 import { Banner } from "@/types/banner";
+import { cacheTag, cacheLife } from "next/cache";
 
 export interface BannersResponse {
     data: Banner[];
@@ -15,10 +16,12 @@ export interface BannersResponse {
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicBanners(): Promise<Banner[]> {
+    "use cache";
+    cacheTag("banners");
+    cacheLife("hours");
+
     try {
-        const res = await fetch(`${API_URL}/api/public/banner`, {
-            next: { revalidate: 3600, tags: ["banners"] }
-        });
+        const res = await fetch(`${API_URL}/api/public/banner`);
 
         if (!res.ok) throw new Error("Failed to fetch public banners");
         return await res.json();

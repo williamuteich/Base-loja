@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateStoreConfig } from "@/lib/store-config";
+import { revalidateTag } from "next/cache";
 
 const PAGE_SIZE = 10;
 
@@ -70,6 +71,8 @@ export async function POST(request: NextRequest) {
                 storeConfigId: config.id
             },
         });
+
+        revalidateTag("store-config", "max");
 
         return NextResponse.json(socialMedia, { status: 201 });
 

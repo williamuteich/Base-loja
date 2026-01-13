@@ -1,14 +1,17 @@
 "use server";
 
 import { Category, CategoriesResponse } from "@/types/category";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicCategories(homeOnly: boolean = false): Promise<Category[]> {
+    "use cache";
+    cacheTag("categories");
+    cacheLife("hours");
+
     try {
-        const res = await fetch(`${API_URL}/api/public/category?home=${homeOnly}`, {
-            next: { revalidate: 3600 }
-        });
+        const res = await fetch(`${API_URL}/api/public/category?home=${homeOnly}`);
         if (!res.ok) throw new Error("Failed to fetch categories");
         return await res.json();
     } catch (error) {

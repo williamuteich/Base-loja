@@ -57,8 +57,8 @@ export default function CategoryCarousel({ categories, backendUrl }: CategoryCar
                                         {category.name}
                                     </h3>
                                     <span className="text-white/80 text-[10px] md:text-xs lg:text-sm uppercase tracking-widest font-bold block drop-shadow-md">
-                                        {category._count.products || 0}{" "}
-                                        {category._count.products === 1 ? "item" : "itens"}
+                                        {category._count?.products || 0}{" "}
+                                        {(category._count?.products || 0) === 1 ? "item" : "itens"}
                                     </span>
                                 </div>
                             </div>

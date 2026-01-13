@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(
     request: NextRequest,
@@ -44,6 +45,8 @@ export async function PATCH(
             }
         });
 
+        revalidateTag("team", "max");
+
         return NextResponse.json(member);
     } catch (error) {
         console.error("[API Private Team PATCH] Error:", error);
@@ -72,6 +75,8 @@ export async function DELETE(
         await prisma.team.delete({
             where: { id },
         });
+
+        revalidateTag("team", "max");
 
         return NextResponse.json({ message: "Membro da equipe removido com sucesso" });
     } catch (error) {

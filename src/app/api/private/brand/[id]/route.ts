@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(
     request: NextRequest,
@@ -37,6 +38,8 @@ export async function PATCH(
                 isActive: data.isActive !== undefined ? data.isActive : undefined,
             },
         });
+
+        revalidateTag("brands", "max");
 
         return NextResponse.json(brand);
     } catch (error) {
@@ -78,6 +81,8 @@ export async function DELETE(
         await prisma.brand.delete({
             where: { id },
         });
+
+        revalidateTag("brands", "max");
 
         return NextResponse.json({ message: "Marca removida com sucesso" });
     } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { UploadHandler } from "@/lib/upload-handler";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(
     request: NextRequest,
@@ -55,6 +56,8 @@ export async function PATCH(
             data,
         });
 
+        revalidateTag("banners", "max");
+
         return NextResponse.json(banner);
     } catch (error) {
         console.error("[API Private Banner PATCH] Error:", error);
@@ -91,6 +94,8 @@ export async function DELETE(
         await prisma.banner.delete({
             where: { id },
         });
+
+        revalidateTag("banners", "max");
 
         return NextResponse.json({ message: "Banner deleted successfully" });
     } catch (error) {

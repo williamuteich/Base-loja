@@ -1,8 +1,24 @@
 "use server";
 
 import { SocialMedia, SocialMediaResponse } from "@/types/social-media";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
+
+export async function getPublicSocialMedias(): Promise<SocialMedia[]> {
+    "use cache";
+    cacheTag("store-config");
+    cacheLife("hours");
+
+    try {
+        const res = await fetch(`${API_URL}/api/public/social-media`);
+        if (!res.ok) throw new Error("Failed to fetch public social medias");
+        return await res.json();
+    } catch (error) {
+        console.error("[Service SocialMedia] getPublicSocialMedias Error:", error);
+        return [];
+    }
+}
 
 export async function getAdminSocialMedias(page: number = 1, limit: number = 10, search: string = ""): Promise<SocialMediaResponse> {
     try {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { UploadHandler } from "@/lib/upload-handler";
+import { revalidateTag } from "next/cache";
 
 const PAGE_SIZE = 10;
 
@@ -93,6 +94,8 @@ export async function POST(request: NextRequest) {
                 isActive,
             },
         });
+
+        revalidateTag("banners", "max");
 
         return NextResponse.json(banner, { status: 201 });
 

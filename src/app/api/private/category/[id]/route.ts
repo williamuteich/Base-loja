@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { UploadHandler } from "@/lib/upload-handler";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -37,6 +38,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                 imageUrl
             }
         });
+
+        revalidateTag("categories", "max");
 
         return NextResponse.json(category);
     } catch (error: any) {
@@ -78,6 +81,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         await prisma.category.delete({
             where: { id }
         });
+
+        revalidateTag("categories", "max");
 
         return NextResponse.json({ message: "Category deleted successfully" });
     } catch (error) {

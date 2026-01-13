@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(
     request: NextRequest,
@@ -19,6 +20,7 @@ export async function PATCH(
             },
         });
 
+        revalidateTag("store-config", "max");
 
         return NextResponse.json(socialMedia);
 
@@ -47,6 +49,8 @@ export async function DELETE(
         await prisma.socialMedia.delete({
             where: { id },
         });
+
+        revalidateTag("store-config", "max");
 
         return NextResponse.json({ message: "Social media deleted successfully" });
 

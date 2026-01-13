@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { UploadHandler } from "@/lib/upload-handler";
+import { revalidateTag } from "next/cache";
 
 export async function GET(req: NextRequest) {
     try {
@@ -73,6 +74,8 @@ export async function POST(req: NextRequest) {
                 imageUrl
             }
         });
+
+        revalidateTag("categories", "max");
 
         return NextResponse.json(category, { status: 201 });
     } catch (error: any) {

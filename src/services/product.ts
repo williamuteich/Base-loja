@@ -1,6 +1,6 @@
 "use server";
 
-import { Product } from "@/types/product";
+import { Product, ProductsResponse } from "@/types/product";
 import { cacheTag, cacheLife } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
@@ -24,7 +24,6 @@ export async function getPublicProducts(): Promise<Product[]> {
             orderBy: { createdAt: 'desc' }
         });
 
-        // Map Prisma Date to string to match Product interface
         return productsRaw.map(product => ({
             ...product,
             createdAt: product.createdAt?.toISOString() || new Date().toISOString(),
@@ -53,14 +52,54 @@ export async function getPublicProducts(): Promise<Product[]> {
     }
 }
 
-export interface ProductsResponse {
-    data: Product[];
-    meta: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
+export async function getPublicProduct(id: string): Promise<Product | null> {
+    "use cache";
+    cacheTag(`product-${id}`);
+    cacheLife("hours");
+
+    try {
+        const res = await fetch(`${API_URL}/api/public/product/${id}`, {
+            method: 'GET',
+            cache: 'force-cache',
+            headers: { 'Content-Type': 'application/json' },
+            next: { tags: [`product-${id}`] }
+        });
+
+        if (!res.ok) {
+            if (res.status === 404) return null;
+            throw new Error(`Failed to fetch product: ${res.statusText}`);
+        }
+
+        const product = await res.json();
+        return product;
+    } catch (error) {
+        console.error(`[Service Product] getPublicProduct Error:`, error);
+        return null;
+    }
+}
+
+export async function getRelatedProducts(id: string, limit: number = 4): Promise<Product[]> {
+    "use cache";
+    cacheTag(`product-related-${id}`);
+    cacheLife("hours");
+
+    try {
+        const res = await fetch(`${API_URL}/api/public/product/${id}/related?limit=${limit}`, {
+            method: 'GET',
+            cache: 'force-cache',
+            headers: { 'Content-Type': 'application/json' },
+            next: { tags: [`product-related-${id}`] }
+        });
+
+        if (!res.ok) {
+            return [];
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error(`[Service Product] getRelatedProducts Error:`, error);
+        return [];
+    }
 }
 
 export async function getAdminProducts(page: number = 1, limit: number = 10, search: string = ""): Promise<ProductsResponse> {
@@ -121,6 +160,7 @@ export async function deleteProduct(id: string): Promise<boolean> {
     try {
         const res = await fetch(`${API_URL}/api/private/product/${id}`, {
             method: "DELETE",
+            headers: { 'Content-Type': 'application/json' },
         });
 
         if (!res.ok) {

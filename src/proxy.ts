@@ -9,13 +9,14 @@ const publicRoutes = [
     { path: "/termos", type: "next" },
     { path: "/cookies", type: "next" },
     { path: "/privacidade", type: "next" },
-    { path: "/nossos-filhotes", type: "next" },
-    { path: "/recuperar-senha", type: "next" },
+    { path: "/produtos", type: "next" },
+    { path: "/categorias", type: "next" },
+    { path: "/contato", type: "next" },
 ] as const;
 
 const dynamicPublicRoutes = [
-    { base: "/filhote", type: "next" },
-    { base: "/redefinir-senha", type: "next" },
+    { base: "/produto", type: "next" },
+    { base: "/categorias", type: "next" },
 ] as const;
 
 export async function proxy(request: NextRequest) {
@@ -26,7 +27,6 @@ export async function proxy(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
 
-    // Proteção de API Privada
     if (path.startsWith("/api/private")) {
         if (!authToken) {
             return NextResponse.json(

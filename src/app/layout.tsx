@@ -3,8 +3,8 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
-  title: "Bazar Elegance - Dashboard",
-  description: "Painel administrativo do Bazar Elegance",
+  title: "Glamour",
+  description: "ecommerce",
 };
 
 export default function RootLayout({

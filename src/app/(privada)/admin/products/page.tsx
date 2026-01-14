@@ -6,11 +6,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 
-import { getAdminProducts, ProductsResponse, deleteProduct } from "@/services/product";
+import { getAdminProducts, deleteProduct } from "@/services/product";
 import GenericPagination from "@/app/(privada)/components/generic-pagination";
 import GenericModal from "../../components/generic-modal";
 import DeleteConfirmation from "../../components/delete-confirmation";
-import { Product } from "@/types/product";
+import { Product, ProductsResponse } from "@/types/product";
 
 export default function ProductsPage() {
     const [isLoading, setIsLoading] = useState(true);

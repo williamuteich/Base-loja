@@ -26,6 +26,17 @@ export async function proxy(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
 
+    // Proteção de API Privada
+    if (path.startsWith("/api/private")) {
+        if (!authToken) {
+            return NextResponse.json(
+                { error: "Unauthorized", message: "Autenticação necessária para acessar este recurso." },
+                { status: 401 }
+            );
+        }
+        return NextResponse.next();
+    }
+
     const staticRoute = publicRoutes.find(r => r.path === path);
     const dynamicRoute = dynamicPublicRoutes.find(r => path.startsWith(r.base));
     const publicRoute = staticRoute || dynamicRoute;
@@ -54,6 +65,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+        "/((?!api/auth|api/public|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
     ],
 };

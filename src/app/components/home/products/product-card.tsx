@@ -74,9 +74,15 @@ export default function ProductCard({ product, backendUrl }: ProductCardProps) {
                     {product.categories?.[0]?.category?.name || 'Produto'}
                 </span>
 
-                <h3 className="font-semibold text-slate-800 text-sm md:text-lg group-hover:text-rose-600 transition-colors truncate mb-2 md:mb-3">
+                <h3 className="font-semibold text-slate-800 text-sm md:text-lg group-hover:text-rose-600 transition-colors line-clamp-1 mb-1">
                     {product.title}
                 </h3>
+
+                {product.description && (
+                    <p className="text-slate-500 text-[10px] md:text-xs line-clamp-2 mb-2 md:mb-3 leading-relaxed">
+                        {product.description}
+                    </p>
+                )}
 
                 <div className="flex items-center gap-2 md:gap-3">
                     <span className="text-rose-600 font-black text-lg md:text-2xl">

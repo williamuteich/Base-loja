@@ -8,3 +8,13 @@ export interface Brand {
         products: number;
     };
 }
+
+export interface BrandsResponse {
+    data: Brand[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}

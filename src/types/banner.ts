@@ -11,3 +11,13 @@ export interface Banner {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface BannersResponse {
+    data: Banner[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}

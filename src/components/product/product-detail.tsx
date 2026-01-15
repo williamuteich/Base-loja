@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Product, ProductVariant } from "@/types/product";
 import { StoreConfig } from "@/types/store-config";
 import { cn } from "@/lib/utils";
-import { Minus, Plus, MessageCircle, Truck, Store, MapPin } from "lucide-react";
+import { Minus, Plus, MessageCircle, Truck, Store, Heart, Share2 } from "lucide-react";
 
 interface ProductDetailProps {
     product: Product;
@@ -71,14 +71,14 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
         const phone = phoneRaw.replace(/\D/g, '');
 
         const parts: string[] = [];
-        parts.push(`Olá, tenho interesse no produto: ${product.title}`);
+        parts.push(`Olá, amei este produto: *${product.title}*`);
         if (selectedVariant) {
-            parts.push(`Formato/variante: ${selectedVariant.color || selectedVariant.name || ''}`.trim());
+            parts.push(`Opção: ${selectedVariant.color || selectedVariant.name || ''}`.trim());
         }
         parts.push(`Quantidade: ${quantity}`);
 
         const urlProduct = `${backendUrl}/produto/${product.id}`;
-        parts.push(`Link do produto: ${urlProduct}`);
+        parts.push(`Link: ${urlProduct}`);
 
         const message = encodeURIComponent(parts.join('\n'));
 
@@ -89,53 +89,52 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
     };
 
     return (
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
-            <div className="space-y-4">
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 pt-4">
+            {/* Gallery Section */}
+            <div className="lg:col-span-7 space-y-4">
+                <div className="relative aspect-4/5 md:aspect-square lg:aspect-4/5 rounded-[2rem] overflow-hidden bg-rose-50/30 border border-rose-100/50 shadow-sm">
                     {images.length > 0 ? (
                         <Image
                             src={`${backendUrl}/${images[selectedImageIndex].url}`}
                             alt={product.title}
                             fill
                             priority
-                            className="object-cover"
+                            className="object-cover hover:scale-105 transition-transform duration-700"
                             unoptimized
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-                                <circle cx="9" cy="9" r="2"></circle>
-                                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
-                            </svg>
+                        <div className="w-full h-full flex items-center justify-center text-rose-300">
+                            <Store size={64} strokeWidth={1} />
                         </div>
                     )}
 
                     {product.discountPrice && product.discountPrice < product.price && (
-                        <span className="absolute top-4 left-4 bg-pink-700 text-white text-sm font-bold px-4 py-2 rounded-full">
-                            -{Math.round(((product.price - product.discountPrice) / product.price) * 100)}% OFF
-                        </span>
+                        <div className="absolute top-6 left-6 flex flex-col items-center justify-center w-16 h-16 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-rose-100">
+                            <span className="text-xs font-medium text-gray-500 uppercase">Off</span>
+                            <span className="text-lg font-bold text-rose-600">
+                                {Math.round(((product.price - product.discountPrice) / product.price) * 100)}%
+                            </span>
+                        </div>
                     )}
                 </div>
 
                 {images.length > 0 && (
-                    <div className="flex gap-3 overflow-x-auto pb-2">
+                    <div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide">
                         {images.map((image, i) => (
                             <button
                                 key={image.url}
                                 type="button"
                                 onClick={() => setSelectedImageIndex(i)}
                                 className={cn(
-                                    "relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0",
+                                    "relative w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all shrink-0",
                                     i === selectedImageIndex
-                                        ? "border-pink-700 shadow-pink-700/30"
-                                        : "border-gray-200 hover:border-pink-700/50"
+                                        ? "border-rose-400 shadow-lg shadow-rose-200"
+                                        : "border-transparent hover:border-rose-200"
                                 )}
                             >
                                 <Image
                                     src={`${backendUrl}/${image.url}`}
-                                    alt="Miniatura do produto"
+                                    alt={`Visualização ${i + 1}`}
                                     fill
                                     className="object-cover"
                                     unoptimized
@@ -146,166 +145,171 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                 )}
             </div>
 
-            <div className="lg:py-4">
-                <div className="flex items-center flex-wrap gap-2 mb-4">
-                    {product.categories && product.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                            {product.categories.map((cat) => (
-                                <span key={cat.categoryId} className="bg-pink-100 text-pink-700 text-xs font-medium px-3 py-1.5 rounded-full">
-                                    {cat.category?.name}
+            <div className="lg:col-span-5 flex flex-col">
+                <div className="sticky top-8 space-y-8">
+                    <div className="space-y-4">
+                        <h1 className="text-4xl lg:text-5xl font-serif text-rose-950 leading-tight">
+                            {product.title}
+                        </h1>
+
+                        <div className="flex items-baseline gap-4">
+                            <span className="text-3xl font-light text-rose-600">
+                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.discountPrice || product.price)}
+                            </span>
+                            {product.discountPrice && product.discountPrice < product.price && (
+                                <span className="text-xl text-rose-300 line-through font-light">
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
                                 </span>
-                            ))}
+                            )}
                         </div>
-                    )}
-                    {product.brand && (
-                        <span className="bg-gray-100 text-gray-700 text-xs md:text-sm px-3 py-1.5 rounded-full">
-                            {product.brand.name}
-                        </span>
-                    )}
-                </div>
 
-                <h1 className="text-3xl md:text-4xl font-bold text-black mb-4">
-                    {product.title}
-                </h1>
+                        <div className="flex flex-col gap-3 pt-2">
+                            {product.brand && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <span className="font-serif text-rose-900">Marca:</span>
+                                    <span className="text-gray-600 font-light">{product.brand.name}</span>
+                                </div>
+                            )}
 
-                {product.description && (
-                    <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                        {product.description}
-                    </p>
-                )}
+                            {product.categories && product.categories.length > 0 && (
+                                <div className="flex items-center gap-2 text-sm">
+                                    <span className="font-serif text-rose-900">Categoria:</span>
+                                    <div className="flex flex-wrap gap-2">
+                                        {product.categories.map((cat) => (
+                                            <span
+                                                key={cat.categoryId}
+                                                className="px-2.5 py-0.5 rounded-full border border-rose-100 text-xs font-medium text-rose-600 bg-rose-50"
+                                            >
+                                                {cat.category?.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                <div className="flex flex-wrap gap-2 mb-6">
-                    {specs.map((spec) => (
-                        <span key={spec.key} className="inline-flex items-center gap-1.5 bg-pink-50 text-gray-800 text-sm px-3 py-1.5 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                className="text-pink-700">
-                                <path d="M20 6 9 17l-5-5"></path>
-                            </svg>
-                            <span className="font-medium capitalize">{spec.key}:</span>
-                            <span>{String(spec.value)}</span>
-                        </span>
-                    ))}
-                </div>
+                    <div className="h-px bg-rose-100/50" />
 
-                <div className="flex items-baseline gap-3 mb-8">
-                    <span className="text-3xl font-bold text-black">
-                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.discountPrice || product.price)}
-                    </span>
-                    {product.discountPrice && product.discountPrice < product.price && (
-                        <span className="text-xl text-gray-500 line-through">
-                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
-                        </span>
-                    )}
-                </div>
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-serif text-gray-900">Detalhes</h3>
+                        <div className="prose prose-rose prose-sm text-gray-600 font-light leading-relaxed whitespace-pre-line">
+                            <p>{product.description}</p>
+                        </div>
 
-                {variants.length > 0 && (
-                    <div className="mb-6">
-                        <span className="text-black font-medium mb-3 block">Formatos disponíveis:</span>
-                        <div className="flex flex-wrap gap-2">
-                            {variants.map((variant) => (
-                                <button
-                                    key={variant.id}
-                                    onClick={() => handleVariantSelect(variant)}
-                                    className={cn(
-                                        "inline-flex items-center cursor-pointer gap-2 px-4 py-3 rounded-xl border-2 text-sm transition-all",
-                                        selectedVariant?.id === variant.id
-                                            ? "border-pink-700 bg-pink-50 text-pink-700"
-                                            : "border-gray-200 bg-white text-gray-700 hover:border-pink-700/50"
-                                    )}
-                                >
-                                    <span className="font-medium flex items-center gap-2">
+                        {specs.length > 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                                {specs.map((spec) => (
+                                    <div key={spec.key} className="flex items-center justify-between py-2 border-b border-gray-100 text-sm">
+                                        <span className="font-medium text-gray-700 capitalize">{spec.key}</span>
+                                        <span className="text-gray-500">{String(spec.value)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="h-px bg-rose-100/50" />
+
+                    {variants.length > 0 && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-gray-900 uppercase tracking-wide">
+                                    Escolha o modelo
+                                </span>
+                            </div>
+                            <div className="flex flex-wrap gap-3">
+                                {variants.map((variant) => (
+                                    <button
+                                        key={variant.id}
+                                        onClick={() => handleVariantSelect(variant)}
+                                        className={cn(
+                                            "group relative cursor-pointer flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300",
+                                            selectedVariant?.id === variant.id
+                                                ? "border-rose-400 bg-rose-50 text-rose-900 shadow-sm"
+                                                : "border-gray-200 bg-white text-gray-600 hover:border-rose-200"
+                                        )}
+                                    >
                                         {variant.color && variant.color.startsWith('#') && (
                                             <span
-                                                className="block w-6 h-6 rounded-full border border-gray-200 shadow-sm shrink-0"
+                                                className="w-4 h-4 rounded-full border border-gray-200 shadow-sm"
                                                 style={{ backgroundColor: variant.color }}
                                             />
                                         )}
-                                        <span>{variant.name}</span>
-                                    </span>
-                                    <span className="text-xs text-gray-500">({variant.quantity} un.)</span>
+                                        <div className="flex flex-col items-start leading-none gap-1">
+                                            <span className="text-sm font-medium">{variant.name}</span>
+                                            <span className="text-[10px] text-gray-500 font-medium">Restam {variant.quantity}</span>
+                                        </div>
+                                        {selectedVariant?.id === variant.id && (
+                                            <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-rose-600 text-white text-[10px] uppercase font-bold rounded-full shadow-sm">
+                                                Leva
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center border border-gray-200 rounded-full p-1 bg-white shadow-sm">
+                                <button
+                                    onClick={decreaseQuantity}
+                                    className={cn(
+                                        "w-10 h-10 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-gray-500 hover:text-rose-600 transition-colors",
+                                        quantity <= 1 && "opacity-50 cursor-not-allowed"
+                                    )}
+                                >
+                                    <Minus size={16} />
                                 </button>
-                            ))}
+                                <span className="w-12 text-center font-medium text-lg text-gray-900">{quantity}</span>
+                                <button
+                                    onClick={increaseQuantity}
+                                    className={cn(
+                                        "w-10 h-10 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-gray-500 hover:text-rose-600 transition-colors",
+                                        (!selectedVariant || quantity >= selectedVariant.quantity) && "opacity-50 cursor-not-allowed"
+                                    )}
+                                >
+                                    <Plus size={16} />
+                                </button>
+                            </div>
+                            <div className="text-sm text-gray-500">
+                                {totalQuantity > 0 ? (
+                                    <span className="flex items-center gap-2 text-emerald-600 font-medium">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                        Disponível
+                                    </span>
+                                ) : (
+                                    <span className="text-rose-500 font-medium">Indisponível</span>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
 
-                {totalQuantity >= 0 && (
-                    <div className="text-sm text-gray-600 mb-6">
-                        <div className="flex items-center gap-2">
-                            <span className="text-black font-medium">Disponibilidade:</span>
-                            {totalQuantity > 0 ? (
-                                <span className="text-green-600 font-medium">Em estoque ({totalQuantity} unidades)</span>
-                            ) : (
-                                <span className="text-red-600 font-medium">Esgotado</span>
-                            )}
+                        <div className="flex gap-4">
+                            <button
+                                onClick={contactViaWhatsApp}
+                                disabled={!selectedVariant || selectedVariant.quantity === 0}
+                                className="flex-1 cursor-pointer h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-medium text-lg shadow-lg shadow-rose-200 hover:shadow-xl hover:shadow-rose-300 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <MessageCircle className="w-6 h-6" />
+                                <span>Eu quero!</span>
+                            </button>
                         </div>
                     </div>
-                )}
 
-                <div className="flex items-center gap-6 mb-8">
-                    <span className="text-black font-medium">Quantidade:</span>
-                    <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
-                        <button
-                            onClick={decreaseQuantity}
-                            className={cn(
-                                "w-12 h-12 flex cursor-pointer items-center justify-center hover:bg-gray-100 transition-colors",
-                                quantity <= 1 && "opacity-50"
-                            )}
-                        >
-                            <Minus size={16} />
-                        </button>
-                        <span className="w-14 text-center font-medium text-lg">{quantity}</span>
-                        <button
-                            onClick={increaseQuantity}
-                            className={cn(
-                                "w-12 h-12 flex cursor-pointer items-center justify-center hover:bg-gray-100 transition-colors",
-                                (!selectedVariant || quantity >= selectedVariant.quantity) && "opacity-50"
-                            )}
-                        >
-                            <Plus size={16} />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                    <button
-                        onClick={contactViaWhatsApp}
-                        disabled={!selectedVariant || selectedVariant.quantity === 0}
-                        className="inline-flex items-center justify-center w-full sm:w-auto whitespace-nowrap font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-700 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-white hover:bg-green-600 bg-green-500 h-14 md:h-12 rounded-xl px-6 md:px-8 text-sm md:text-base flex-1 gap-2.5 shadow-lg shadow-green-500/40 disabled:shadow-none"
-                    >
-                        <MessageCircle size={20} />
-                        Falar no WhatsApp
-                    </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-6 bg-pink-50/50 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center">
-                            <Store className="w-5 h-5 text-pink-700" />
-                        </div>
-                        <div className="leading-none flex flex-col gap-3">
-                            <span className="text-sm font-medium text-black block leading-none">Qualidade garantida</span>
-                            <span className="text-[11px] text-gray-600 leading-[1.3] -mt-0.5 block">Produtos selecionados com cuidado</span>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center">
-                            <MapPin className="w-5 h-5 text-pink-700" />
-                        </div>
-                        <div className="leading-none flex flex-col gap-3">
-                            <span className="text-sm font-medium text-black block leading-none">Retire na loja</span>
-                            <span className="text-[11px] text-gray-600 leading-[1.3] -mt-0.5 block">Facilidade e proximidade</span>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center">
-                            <Truck className="w-5 h-5 text-pink-700" />
-                        </div>
-                        <div className="leading-none flex flex-col gap-3">
-                            <span className="text-sm font-medium text-black block leading-none">Atendimento próximo</span>
-                            <span className="text-[11px] text-gray-600 leading-[1.3] -mt-0.5 block">Fale direto com o comerciante</span>
-                        </div>
+                    <div className="grid grid-cols-3 gap-4 pt-6">
+                        {[
+                            { icon: Store, title: "Loja Física", desc: "Visite-nos" },
+                            { icon: Truck, title: "Entrega", desc: "Para todo Brasil" },
+                            { icon: Share2, title: "Compartilhe", desc: "Com amigas" },
+                        ].map((item, i) => (
+                            <div key={i} className="flex flex-col items-center text-center gap-2 p-4 rounded-2xl bg-gray-50 hover:bg-rose-50/50 transition-colors">
+                                <item.icon className="w-6 h-6 text-rose-400" />
+                                <span className="text-xs font-semibold text-gray-900 uppercase tracking-wide">{item.title}</span>
+                                <span className="text-[10px] text-gray-500">{item.desc}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

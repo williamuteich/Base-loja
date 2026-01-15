@@ -3,6 +3,7 @@
 import { Product, ProductsResponse } from "@/types/product";
 import { cacheTag, cacheLife } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -120,8 +121,12 @@ export async function getAdminProducts(page: number = 1, limit: number = 10, sea
 
 export async function createProduct(formData: FormData): Promise<Product | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/product`, {
             method: "POST",
+            headers: {
+                Cookie: cookieStore.toString()
+            },
             body: formData,
         });
 
@@ -139,8 +144,12 @@ export async function createProduct(formData: FormData): Promise<Product | null>
 
 export async function updateProduct(id: string, formData: FormData): Promise<Product | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/product/${id}`, {
             method: "PATCH",
+            headers: {
+                Cookie: cookieStore.toString()
+            },
             body: formData,
         });
 
@@ -158,9 +167,13 @@ export async function updateProduct(id: string, formData: FormData): Promise<Pro
 
 export async function deleteProduct(id: string): Promise<boolean> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/product/${id}`, {
             method: "DELETE",
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                Cookie: cookieStore.toString()
+            },
         });
 
         if (!res.ok) {

@@ -1,18 +1,9 @@
 "use server";
 
-import { Banner } from "@/types/banner";
+import { Banner, BannersResponse } from "@/types/banner";
 import { cacheTag, cacheLife } from "next/cache";
 import { prisma } from "@/lib/prisma";
-
-export interface BannersResponse {
-    data: Banner[];
-    meta: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
-}
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -56,8 +47,12 @@ export async function getAdminBanners(page: number = 1, limit: number = 10, sear
 
 export async function createBanner(formData: FormData): Promise<Banner | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/banner`, {
             method: "POST",
+            headers: {
+                Cookie: cookieStore.toString()
+            },
             body: formData,
         });
 
@@ -75,8 +70,12 @@ export async function createBanner(formData: FormData): Promise<Banner | null> {
 
 export async function updateBanner(id: string, formData: FormData): Promise<Banner | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/banner/${id}`, {
             method: "PATCH",
+            headers: {
+                Cookie: cookieStore.toString()
+            },
             body: formData,
         });
 
@@ -94,8 +93,12 @@ export async function updateBanner(id: string, formData: FormData): Promise<Bann
 
 export async function deleteBanner(id: string): Promise<boolean> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/banner/${id}`, {
             method: "DELETE",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
         });
 
         if (!res.ok) {

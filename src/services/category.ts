@@ -3,6 +3,7 @@
 import { Category, CategoriesResponse } from "@/types/category";
 import { cacheTag, cacheLife } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -101,8 +102,12 @@ export async function getAdminCategories(page: number = 1, limit: number = 10, s
 
 export async function createCategory(data: FormData): Promise<Category> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/category`, {
             method: "POST",
+            headers: {
+                Cookie: cookieStore.toString()
+            },
             body: data
         });
 
@@ -120,8 +125,12 @@ export async function createCategory(data: FormData): Promise<Category> {
 
 export async function updateCategory(id: string, data: FormData): Promise<Category> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/category/${id}`, {
             method: "PATCH",
+            headers: {
+                Cookie: cookieStore.toString()
+            },
             body: data
         });
 
@@ -139,8 +148,12 @@ export async function updateCategory(id: string, data: FormData): Promise<Catego
 
 export async function deleteCategory(id: string): Promise<void> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/category/${id}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
         });
 
         if (!res.ok) {

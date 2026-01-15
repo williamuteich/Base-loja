@@ -1,18 +1,9 @@
 "use server";
 
-import { Brand } from "@/types/brand";
+import { Brand, BrandsResponse } from "@/types/brand";
 import { cacheTag, cacheLife } from "next/cache";
 import { prisma } from "@/lib/prisma";
-
-export interface BrandsResponse {
-    data: Brand[];
-    meta: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
-}
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -80,10 +71,12 @@ export async function getAdminBrands(page: number = 1, limit: number = 10, searc
 
 export async function createBrand(data: { name: string; isActive?: boolean }): Promise<Brand> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/brand`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Cookie: cookieStore.toString()
             },
             body: JSON.stringify(data),
         });
@@ -102,10 +95,12 @@ export async function createBrand(data: { name: string; isActive?: boolean }): P
 
 export async function updateBrand(id: string, data: { name?: string; isActive?: boolean }): Promise<Brand> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/brand/${id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
+                Cookie: cookieStore.toString()
             },
             body: JSON.stringify(data),
         });
@@ -124,8 +119,12 @@ export async function updateBrand(id: string, data: { name?: string; isActive?: 
 
 export async function deleteBrand(id: string): Promise<boolean> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/brand/${id}`, {
             method: "DELETE",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
         });
 
         if (!res.ok) {

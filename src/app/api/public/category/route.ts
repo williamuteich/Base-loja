@@ -54,8 +54,22 @@ export async function GET(req: NextRequest) {
         const includeProducts = searchParams.get("includeProducts") === "true";
         const skip = parseInt(searchParams.get("skip") || "0");
         const take = parseInt(searchParams.get("take") || "10");
+        const paginated = searchParams.get("paginated") === "true";
 
         const categories = await getCachedCategories(skip, take, homeOnly, includeProducts);
+
+        if (paginated) {
+            const total = await prisma.category.count({ where: { isActive: true, ...(homeOnly ? { isHome: true } : {}) } });
+            return NextResponse.json({
+                data: categories,
+                meta: {
+                    total,
+                    page: Math.floor(skip / take) + 1,
+                    limit: take,
+                    totalPages: Math.ceil(total / take)
+                }
+            });
+        }
 
         return NextResponse.json(categories);
     } catch (error) {

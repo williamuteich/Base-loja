@@ -20,6 +20,22 @@ export async function getPublicCategories(homeOnly: boolean = false, includeProd
     }
 }
 
+export async function getPaginatedPublicCategories(page: number = 1, limit: number = 10): Promise<CategoriesResponse> {
+    try {
+        const url = new URL(`${API_URL}/api/public/category`);
+        url.searchParams.set("skip", ((page - 1) * limit).toString());
+        url.searchParams.set("take", limit.toString());
+        url.searchParams.set("paginated", "true");
+
+        const res = await fetch(url.toString(), { next: { tags: ["categories"] } });
+        if (!res.ok) throw new Error("Failed to fetch paginated public categories");
+        return await res.json();
+    } catch (error) {
+        console.error("[Service Category] getPaginatedPublicCategories Error:", error);
+        return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
+    }
+}
+
 export async function getAdminCategories(page: number = 1, limit: number = 10, search: string = ""): Promise<CategoriesResponse> {
     try {
         const cookieStore = await cookies();

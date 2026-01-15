@@ -63,9 +63,12 @@ export default function ProductCard({ product, backendUrl }: ProductCardProps) {
                 )}
 
                 {hasDiscount && (
-                    <span className="absolute top-3 left-3 md:top-4 md:left-4 bg-linear-to-r from-rose-500 to-pink-600 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
-                        -{calculateDiscountPercentage(product.price, product.discountPrice!)}% OFF
-                    </span>
+                    <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-rose-100 z-10">
+                        <span className="text-[8px] md:text-[10px] font-medium text-gray-500 uppercase">Off</span>
+                        <span className="text-sm md:text-base font-bold text-rose-600 leading-none">
+                            {calculateDiscountPercentage(product.price, product.discountPrice!)}%
+                        </span>
+                    </div>
                 )}
             </div>
 

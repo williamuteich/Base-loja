@@ -148,7 +148,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
             <div className="lg:col-span-5 flex flex-col">
                 <div className="sticky top-8 space-y-8">
                     <div className="space-y-4">
-                        <h1 className="text-4xl lg:text-5xl font-serif text-rose-950 leading-tight">
+                        <h1 className="text-3xl lg:text-4xl font-semibold text-slate-900 leading-tight">
                             {product.title}
                         </h1>
 

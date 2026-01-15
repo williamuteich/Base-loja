@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Product, ProductVariant } from "@/types/product";
 import { StoreConfig } from "@/types/store-config";
 import { cn } from "@/lib/utils";
-import { Minus, Plus, MessageCircle, Truck, Store, Heart, Share2 } from "lucide-react";
+import { Minus, Plus, MessageCircle, Truck, Store, Heart, Share2, Sparkles, Star, Package } from "lucide-react";
 
 interface ProductDetailProps {
     product: Product;
@@ -17,6 +17,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const [quantity, setQuantity] = useState(1);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
         if (product.variants && product.variants.length > 0) {
@@ -71,14 +72,14 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
         const phone = phoneRaw.replace(/\D/g, '');
 
         const parts: string[] = [];
-        parts.push(`Olá, amei este produto: *${product.title}*`);
+        parts.push(`✨ Olá, amei este produto: *${product.title}* ✨`);
         if (selectedVariant) {
-            parts.push(`Opção: ${selectedVariant.color || selectedVariant.name || ''}`.trim());
+            parts.push(`💎 Opção: ${selectedVariant.color || selectedVariant.name || ''}`.trim());
         }
-        parts.push(`Quantidade: ${quantity}`);
+        parts.push(`📦 Quantidade: ${quantity}`);
 
         const urlProduct = `${backendUrl}/produto/${product.id}`;
-        parts.push(`Link: ${urlProduct}`);
+        parts.push(`🔗 Link: ${urlProduct}`);
 
         const message = encodeURIComponent(parts.join('\n'));
 
@@ -88,54 +89,90 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
         window.open(waUrl, '_blank');
     };
 
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: product.title,
+                text: `Confira este lindo produto: ${product.title}`,
+                url: window.location.href,
+            });
+        }
+    };
+
     return (
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 pt-4">
-            <div className="lg:col-span-6 space-y-4">
-                <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-white/50 border border-slate-100 shadow-sm">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 pt-6">
+            <div className="lg:col-span-6 space-y-6">
+                <div className="relative aspect-square rounded-[2.5rem] overflow-hidden bg-linear-to-br from-white to-rose-50/30 border-2 border-rose-100 shadow-2xl shadow-rose-100/30">
                     {images.length > 0 ? (
                         <Image
                             src={`${backendUrl}/${images[selectedImageIndex].url}`}
                             alt={product.title}
                             fill
                             priority
-                            className="object-contain"
+                            className="object-contain p-6"
                             unoptimized
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-rose-300">
-                            <Store size={64} strokeWidth={1} />
+                        <div className="w-full h-full flex items-center justify-center text-rose-200">
+                            <Sparkles size={72} strokeWidth={1} />
                         </div>
                     )}
 
+                    <button
+                        onClick={() => setIsFavorite(!isFavorite)}
+                        className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-full shadow-lg border border-rose-100 hover:shadow-rose-200/50 transition-all hover:scale-105"
+                    >
+                        <Heart
+                            size={20}
+                            className={isFavorite ? "fill-rose-500 text-rose-500" : "text-rose-300"}
+                        />
+                    </button>
+
                     {product.discountPrice && product.discountPrice < product.price && (
-                        <div className="absolute top-6 left-6 flex flex-col items-center justify-center w-16 h-16 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-rose-100">
-                            <span className="text-xs font-medium text-gray-500 uppercase">Off</span>
-                            <span className="text-lg font-bold text-rose-600">
+                        <div className="absolute top-6 left-6 flex flex-col items-center justify-center w-14 h-14 bg-rose-600 text-white rounded-full shadow-xl border-2 border-white z-20">
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Off</span>
+                            <span className="text-base font-black leading-none">
                                 {Math.round(((product.price - product.discountPrice) / product.price) * 100)}%
                             </span>
                         </div>
                     )}
+
+                    <div className="absolute bottom-6 left-6 right-6 flex items-center justify-center gap-2">
+                        {images.map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setSelectedImageIndex(i)}
+                                className={cn(
+                                    "h-2 rounded-full transition-all duration-300",
+                                    i === selectedImageIndex
+                                        ? "w-8 bg-rose-400"
+                                        : "w-2 bg-rose-200 hover:bg-rose-300"
+                                )}
+                            />
+                        ))}
+                    </div>
                 </div>
 
-                {images.length > 0 && (
-                    <div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide">
+                {images.length > 1 && (
+                    <div className="flex gap-4 overflow-x-auto pb-2 px-1 scrollbar-hide">
                         {images.map((image, i) => (
                             <button
                                 key={image.url}
                                 type="button"
                                 onClick={() => setSelectedImageIndex(i)}
                                 className={cn(
-                                    "relative w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all shrink-0",
+                                    "relative w-28 h-28 rounded-3xl overflow-hidden border-4 transition-all duration-300 shrink-0 group",
                                     i === selectedImageIndex
-                                        ? "border-rose-400 shadow-lg shadow-rose-200"
-                                        : "border-transparent hover:border-rose-200"
+                                        ? "border-rose-400 shadow-xl shadow-rose-200/50"
+                                        : "border-white hover:border-rose-100 shadow-lg shadow-slate-100"
                                 )}
                             >
+                                <div className="absolute inset-0 bg-linear-to-br from-white/50 to-transparent z-10" />
                                 <Image
                                     src={`${backendUrl}/${image.url}`}
                                     alt={`Visualização ${i + 1}`}
                                     fill
-                                    className="object-contain"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     unoptimized
                                 />
                             </button>
@@ -145,168 +182,191 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
             </div>
 
             <div className="lg:col-span-6 flex flex-col">
-                <div className="sticky top-8 space-y-8">
-                    <div className="space-y-4">
-                        <h1 className="text-3xl lg:text-4xl font-semibold text-slate-900 leading-tight">
-                            {product.title}
-                        </h1>
-
-                        <div className="flex items-baseline gap-4">
-                            <span className="text-3xl font-light text-rose-600">
-                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.discountPrice || product.price)}
-                            </span>
-                            {product.discountPrice && product.discountPrice < product.price && (
-                                <span className="text-xl text-rose-300 line-through font-light">
-                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
-                                </span>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col gap-3 pt-2">
-                            {product.brand && (
-                                <div className="flex items-center gap-2 text-sm">
-                                    <span className="font-serif text-rose-900">Marca:</span>
-                                    <span className="text-gray-600 font-light">{product.brand.name}</span>
+                <div className="sticky top-8 p-8 lg:p-10 bg-linear-to-b from-white to-rose-50/30 border-2 border-rose-50 shadow-2xl shadow-rose-100/30 rounded-[2.5rem] space-y-8">
+                    <div className="space-y-6">
+                        <div className="space-y-4">
+                            {(product.brand || (product.categories && product.categories.length > 0)) && (
+                                <div className="flex items-center gap-3 text-sm font-semibold text-rose-500/90 uppercase tracking-[0.15em]">
+                                    {product.brand && (
+                                        <span className="px-4 py-1.5 bg-rose-50 rounded-full">{product.brand.name}</span>
+                                    )}
+                                    {product.categories?.[0] && (
+                                        <>
+                                            <Sparkles size={12} className="text-rose-300" />
+                                            <span className="px-4 py-1.5 bg-rose-50 rounded-full">{product.categories[0].category?.name}</span>
+                                        </>
+                                    )}
                                 </div>
                             )}
 
-                            {product.categories && product.categories.length > 0 && (
-                                <div className="flex items-center gap-2 text-sm">
-                                    <span className="font-serif text-rose-900">Categoria:</span>
-                                    <div className="flex flex-wrap gap-2">
-                                        {product.categories.map((cat) => (
-                                            <span
-                                                key={cat.categoryId}
-                                                className="px-2.5 py-0.5 rounded-full border border-rose-100 text-xs font-medium text-rose-600 bg-rose-50"
-                                            >
-                                                {cat.category?.name}
-                                            </span>
-                                        ))}
+                            <div className="flex items-start justify-between gap-4">
+                                <h1 className="text-3xl lg:text-4xl font-serif font-bold text-slate-800 leading-tight tracking-tight">
+                                    {product.title}
+                                </h1>
+                                <button
+                                    onClick={handleShare}
+                                    className="w-12 h-12 flex items-center justify-center bg-rose-50 hover:bg-rose-100 rounded-full border border-rose-100 transition-all hover:scale-105 shrink-0"
+                                >
+                                    <Share2 size={20} className="text-rose-500" />
+                                </button>
+                            </div>
+
+
+                            <div className="flex items-center gap-6 pt-2">
+                                <div className="flex items-baseline gap-3">
+                                    <span className="text-4xl font-bold text-rose-600 tracking-tight">
+                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.discountPrice || product.price)}
+                                    </span>
+                                    {product.discountPrice && product.discountPrice < product.price && (
+                                        <span className="text-xl text-slate-400 line-through font-medium">
+                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {totalQuantity > 0 && (
+                                    <div className="flex items-center gap-2 px-4 py-1.5 bg-rose-50/50 rounded-full border border-rose-100/50">
+                                        <div className="w-1.5 h-1.5 bg-rose-400 rounded-full animate-pulse" />
+                                        <span className="text-[13px] font-medium text-rose-900/80">
+                                            {totalQuantity} unidades disponíveis
+                                        </span>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    <div className="h-px bg-rose-100/50" />
+                    <div className="h-px bg-linear-to-r from-transparent via-rose-200/50 to-transparent" />
 
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-serif text-gray-900">Detalhes</h3>
-                        <div className="prose prose-rose prose-sm text-gray-600 font-light leading-relaxed whitespace-pre-line">
-                            <p>{product.description}</p>
+                    <div className="space-y-6">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-8 bg-linear-to-b from-rose-400 to-pink-400 rounded-full" />
+                                <h3 className="text-lg font-semibold text-slate-800">Descrição</h3>
+                            </div>
+                            <div className="prose prose-slate prose-lg text-slate-600 font-light leading-relaxed whitespace-pre-line pl-4">
+                                <p>{product.description}</p>
+                            </div>
                         </div>
 
                         {specs.length > 0 && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                {specs.map((spec) => (
-                                    <div key={spec.key} className="flex items-center justify-between py-2 border-b border-gray-100 text-sm">
-                                        <span className="font-medium text-gray-700 capitalize">{spec.key}</span>
-                                        <span className="text-gray-500">{String(spec.value)}</span>
-                                    </div>
-                                ))}
+                            <div className="pt-4 space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-3 h-8 bg-linear-to-b from-rose-400 to-pink-400 rounded-full" />
+                                    <h3 className="text-lg font-semibold text-slate-800">Detalhes</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">
+                                    {specs.map((spec) => (
+                                        <div key={spec.key} className="flex items-center gap-3 p-3 bg-white/50 rounded-2xl border border-rose-100">
+                                            <div className="w-8 h-8 flex items-center justify-center bg-rose-100 rounded-lg">
+                                                <Package size={16} className="text-rose-500" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="text-sm font-medium text-slate-400 capitalize">{spec.key}</div>
+                                                <div className="text-sm text-slate-700 font-medium">{String(spec.value)}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
 
-                    <div className="h-px bg-rose-100/50" />
+                    <div className="h-px bg-linear-to-r from-transparent via-rose-200/50 to-transparent" />
 
                     {variants.length > 0 && (
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm font-medium text-gray-900 uppercase tracking-wide">
-                                    Escolha o modelo
+                        <div className="space-y-5">
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-8 bg-linear-to-b from-rose-400 to-pink-400 rounded-full" />
+                                <span className="text-lg font-semibold text-slate-800">
+                                    Escolha a cor
                                 </span>
                             </div>
-                            <div className="flex flex-wrap gap-3">
+                            <div className="flex flex-wrap gap-3 pl-4">
                                 {variants.map((variant) => (
                                     <button
                                         key={variant.id}
                                         onClick={() => handleVariantSelect(variant)}
                                         className={cn(
-                                            "group relative cursor-pointer flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300",
+                                            "group relative cursor-pointer flex flex-col items-center gap-2 p-4 rounded-3xl border-2 transition-all duration-300 min-w-[100px]",
                                             selectedVariant?.id === variant.id
-                                                ? "border-rose-400 bg-rose-50 text-rose-900 shadow-sm"
-                                                : "border-gray-200 bg-white text-gray-600 hover:border-rose-200"
+                                                ? "border-rose-400 bg-rose-50 shadow-lg shadow-rose-200/30"
+                                                : "border-rose-100 bg-white hover:border-rose-200 hover:shadow-md"
                                         )}
                                     >
                                         {variant.color && variant.color.startsWith('#') && (
-                                            <span
-                                                className="w-4 h-4 rounded-full border border-gray-200 shadow-sm"
-                                                style={{ backgroundColor: variant.color }}
-                                            />
+                                            <div className="relative">
+                                                <span
+                                                    className="w-10 h-10 rounded-2xl border-2 border-white shadow-lg"
+                                                    style={{ backgroundColor: variant.color }}
+                                                />
+                                                {selectedVariant?.id === variant.id && (
+                                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                                                        <div className="w-2 h-2 bg-white rounded-full" />
+                                                    </div>
+                                                )}
+                                            </div>
                                         )}
-                                        <div className="flex flex-col items-start leading-none gap-1">
-                                            <span className="text-sm font-medium">{variant.name}</span>
-                                            <span className="text-[10px] text-gray-500 font-medium">Restam {variant.quantity}</span>
-                                        </div>
-                                        {selectedVariant?.id === variant.id && (
-                                            <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-rose-600 text-white text-[10px] uppercase font-bold rounded-full shadow-sm">
-                                                Leva
+                                        <div className="flex flex-col items-center leading-none gap-1">
+                                            <span className="text-sm font-semibold text-slate-800 capitalize">{variant.name}</span>
+                                            <span className="text-xs text-slate-500">
+                                                {variant.quantity} disponíveis
                                             </span>
-                                        )}
+                                        </div>
                                     </button>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center border border-gray-200 rounded-full p-1 bg-white shadow-sm">
+                    <div className="space-y-6 pt-2">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex items-center border-2 border-rose-100 rounded-full p-1.5 bg-white w-fit shadow-inner">
                                 <button
                                     onClick={decreaseQuantity}
                                     className={cn(
-                                        "w-10 h-10 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-gray-500 hover:text-rose-600 transition-colors",
-                                        quantity <= 1 && "opacity-50 cursor-not-allowed"
+                                        "w-12 h-12 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
+                                        quantity <= 1 && "opacity-30 cursor-not-allowed"
                                     )}
                                 >
-                                    <Minus size={16} />
+                                    <Minus size={18} />
                                 </button>
-                                <span className="w-12 text-center font-medium text-lg text-gray-900">{quantity}</span>
+                                <span className="w-12 text-center font-bold text-lg text-slate-800">{quantity}</span>
                                 <button
                                     onClick={increaseQuantity}
                                     className={cn(
-                                        "w-10 h-10 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-gray-500 hover:text-rose-600 transition-colors",
-                                        (!selectedVariant || quantity >= selectedVariant.quantity) && "opacity-50 cursor-not-allowed"
+                                        "w-12 h-12 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
+                                        (!selectedVariant || quantity >= selectedVariant.quantity) && "opacity-30 cursor-not-allowed"
                                     )}
                                 >
-                                    <Plus size={16} />
+                                    <Plus size={18} />
                                 </button>
                             </div>
-                            <div className="text-sm text-gray-500">
-                                {totalQuantity > 0 ? (
-                                    <span className="flex items-center gap-2 text-emerald-600 font-medium">
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                        Disponível
-                                    </span>
-                                ) : (
-                                    <span className="text-rose-500 font-medium">Indisponível</span>
-                                )}
-                            </div>
-                        </div>
 
-                        <div className="flex gap-4">
                             <button
                                 onClick={contactViaWhatsApp}
                                 disabled={!selectedVariant || selectedVariant.quantity === 0}
-                                className="flex-1 cursor-pointer h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-medium text-lg shadow-lg shadow-rose-200 hover:shadow-xl hover:shadow-rose-300 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 cursor-pointer h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-bold text-sm tracking-[0.2em] uppercase shadow-xl shadow-rose-200 hover:shadow-rose-300 transition-all duration-500 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
                             >
-                                <MessageCircle className="w-6 h-6" />
-                                <span>Eu quero!</span>
+                                <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                <span>Solicitar via WhatsApp</span>
                             </button>
                         </div>
+
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 pt-6">
+                    <div className="grid grid-cols-3 gap-4 pt-4">
                         {[
-                            { icon: Store, title: "Loja Física", desc: "Visite-nos" },
-                            { icon: Truck, title: "Entrega", desc: "Para todo Brasil" },
-                            { icon: Share2, title: "Compartilhe", desc: "Com amigas" },
+                            { icon: Store, title: "Loja Física", desc: "Visite nossa vitrine" },
+                            { icon: Sparkles, title: "Peças Exclusivas", desc: "Curadoria especial" },
+                            { icon: MessageCircle, title: "Atendimento", desc: "Consultoria pessoal" },
                         ].map((item, i) => (
-                            <div key={i} className="flex flex-col items-center text-center gap-2 p-4 rounded-2xl bg-gray-50 hover:bg-rose-50/50 transition-colors">
-                                <item.icon className="w-6 h-6 text-rose-400" />
-                                <span className="text-xs font-semibold text-gray-900 uppercase tracking-wide">{item.title}</span>
-                                <span className="text-[10px] text-gray-500">{item.desc}</span>
+                            <div key={i} className="flex flex-col items-center text-center gap-2 p-4 rounded-[2rem] bg-white border border-rose-100/40 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-100/20 transition-all duration-500 group">
+                                <div className="w-10 h-10 flex items-center justify-center bg-rose-50 rounded-full mb-1 group-hover:scale-110 transition-transform duration-500">
+                                    <item.icon className="w-5 h-5 text-rose-400" />
+                                </div>
+                                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">{item.title}</span>
+                                <span className="text-[10px] text-slate-400 leading-tight">{item.desc}</span>
                             </div>
                         ))}
                     </div>

@@ -87,7 +87,6 @@ export default async function CategoriasPage({
                                     </div>
                                 )}
 
-                                {/* Subtle Luxury Overlay */}
                                 <div className="absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>
 
                                 <div className="absolute inset-x-0 bottom-0 p-3 flex flex-col items-center text-center">

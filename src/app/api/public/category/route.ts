@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     await connection();
     try {
         const { searchParams } = new URL(req.url);
-        const homeOnly = searchParams.get("home") === "true";
+        const homeOnly = searchParams.get("homeOnly") === "true";
         const includeProducts = searchParams.get("includeProducts") === "true";
         const skip = parseInt(searchParams.get("skip") || "0");
         const take = parseInt(searchParams.get("take") || "10");

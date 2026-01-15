@@ -16,6 +16,24 @@ export async function getPublicProducts(): Promise<Product[]> {
     }
 }
 
+export async function getPaginatedPublicProducts(page: number = 1, limit: number = 12, category?: string, search?: string): Promise<ProductsResponse> {
+    try {
+        const url = new URL(`${API_URL}/api/public/product`);
+        url.searchParams.set("skip", ((page - 1) * limit).toString());
+        url.searchParams.set("take", limit.toString());
+        url.searchParams.set("paginated", "true");
+        if (category) url.searchParams.set("category", category);
+        if (search) url.searchParams.set("search", search);
+
+        const res = await fetch(url.toString(), { next: { tags: ["products"] } });
+        if (!res.ok) throw new Error("Failed to fetch paginated public products");
+        return await res.json();
+    } catch (error) {
+        console.error("[Service Product] getPaginatedPublicProducts Error:", error);
+        return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
+    }
+}
+
 export async function getPublicProduct(id: string): Promise<Product | null> {
     try {
         const res = await fetch(`${API_URL}/api/public/product/${id}`, {

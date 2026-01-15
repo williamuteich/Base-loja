@@ -14,16 +14,45 @@ export interface TeamResponse {
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
+import { prisma } from "@/lib/prisma";
+
 export async function getAdminTeam(page: number = 1, limit: number = 10, search: string = ""): Promise<TeamResponse> {
     try {
-        const url = new URL(`${API_URL}/api/private/team`);
-        url.searchParams.set("page", page.toString());
-        url.searchParams.set("limit", limit.toString());
-        if (search) url.searchParams.set("search", search);
+        const skip = (page - 1) * limit;
+        const where: any = {};
 
-        const res = await fetch(url.toString(), { cache: "no-store" });
-        if (!res.ok) throw new Error("Falha ao buscar equipe");
-        return await res.json();
+        if (search) {
+            where.OR = [
+                { name: { contains: search } },
+                { role: { contains: search } }
+            ];
+        }
+
+        const [data, total] = await Promise.all([
+            prisma.team.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { name: "asc" },
+            }),
+            prisma.team.count({ where }),
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: data.map((member: any) => ({
+                ...member,
+                createdAt: member.createdAt.toISOString(),
+                updatedAt: member.updatedAt.toISOString(),
+            })),
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages,
+            },
+        };
     } catch (error) {
         console.error("[Service Team] getAdminTeam Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };

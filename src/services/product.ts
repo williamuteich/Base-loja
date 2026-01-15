@@ -59,20 +59,41 @@ export async function getPublicProduct(id: string): Promise<Product | null> {
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/api/public/product/${id}`, {
-            method: 'GET',
-            cache: 'force-cache',
-            headers: { 'Content-Type': 'application/json' },
-            next: { tags: [`product-${id}`] }
+        const product = await prisma.product.findUnique({
+            where: { id },
+            include: {
+                images: true,
+                categories: {
+                    include: { category: true }
+                },
+                brand: true
+            }
         });
 
-        if (!res.ok) {
-            if (res.status === 404) return null;
-            throw new Error(`Failed to fetch product: ${res.statusText}`);
-        }
+        if (!product) return null;
 
-        const product = await res.json();
-        return product;
+        return {
+            ...product,
+            createdAt: product.createdAt?.toISOString() || new Date().toISOString(),
+            images: product.images?.map(img => ({
+                ...img,
+                createdAt: img.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: img.updatedAt?.toISOString() || new Date().toISOString(),
+            })) || [],
+            categories: product.categories?.map(cat => ({
+                ...cat,
+                category: cat.category ? {
+                    ...cat.category,
+                    createdAt: cat.category.createdAt?.toISOString() || new Date().toISOString(),
+                    updatedAt: cat.category.updatedAt?.toISOString() || new Date().toISOString(),
+                } : { name: "N/A", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+            })) || [],
+            brand: product.brand ? {
+                ...product.brand,
+                createdAt: product.brand.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: product.brand.updatedAt?.toISOString() || new Date().toISOString(),
+            } : undefined
+        } as any;
     } catch (error) {
         console.error(`[Service Product] getPublicProduct Error:`, error);
         return null;
@@ -85,18 +106,57 @@ export async function getRelatedProducts(id: string, limit: number = 4): Promise
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/api/public/product/${id}/related?limit=${limit}`, {
-            method: 'GET',
-            cache: 'force-cache',
-            headers: { 'Content-Type': 'application/json' },
-            next: { tags: [`product-related-${id}`] }
+        const currentProduct = await prisma.product.findUnique({
+            where: { id },
+            include: { categories: true }
         });
 
-        if (!res.ok) {
-            return [];
-        }
+        if (!currentProduct) return [];
 
-        return await res.json();
+        const categoryIds = currentProduct.categories.map(c => c.categoryId);
+
+        const products = await prisma.product.findMany({
+            where: {
+                id: { not: id },
+                isActive: true,
+                categories: {
+                    some: {
+                        categoryId: { in: categoryIds }
+                    }
+                }
+            },
+            take: limit,
+            include: {
+                images: true,
+                categories: {
+                    include: { category: true }
+                },
+                brand: true
+            }
+        });
+
+        return products.map(product => ({
+            ...product,
+            createdAt: product.createdAt?.toISOString() || new Date().toISOString(),
+            images: product.images?.map(img => ({
+                ...img,
+                createdAt: img.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: img.updatedAt?.toISOString() || new Date().toISOString(),
+            })) || [],
+            categories: product.categories?.map(cat => ({
+                ...cat,
+                category: cat.category ? {
+                    ...cat.category,
+                    createdAt: cat.category.createdAt?.toISOString() || new Date().toISOString(),
+                    updatedAt: cat.category.updatedAt?.toISOString() || new Date().toISOString(),
+                } : { name: "N/A", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+            })) || [],
+            brand: product.brand ? {
+                ...product.brand,
+                createdAt: product.brand.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: product.brand.updatedAt?.toISOString() || new Date().toISOString(),
+            } : undefined
+        })) as any;
     } catch (error) {
         console.error(`[Service Product] getRelatedProducts Error:`, error);
         return [];
@@ -105,14 +165,66 @@ export async function getRelatedProducts(id: string, limit: number = 4): Promise
 
 export async function getAdminProducts(page: number = 1, limit: number = 10, search: string = ""): Promise<ProductsResponse> {
     try {
-        const url = new URL(`${API_URL}/api/private/product`);
-        url.searchParams.set("page", page.toString());
-        url.searchParams.set("limit", limit.toString());
-        if (search) url.searchParams.set("search", search);
+        const skip = (page - 1) * limit;
+        const where: any = {};
 
-        const res = await fetch(url.toString(), { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to fetch admin products");
-        return await res.json();
+        if (search) {
+            where.OR = [
+                { name: { contains: search } },
+                { description: { contains: search } },
+                { sku: { contains: search } }
+            ];
+        }
+
+        const [data, total] = await Promise.all([
+            prisma.product.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { createdAt: "desc" },
+                include: {
+                    images: true,
+                    categories: {
+                        include: { category: true }
+                    },
+                    brand: true
+                }
+            }),
+            prisma.product.count({ where }),
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: data.map(product => ({
+                ...product,
+                createdAt: product.createdAt?.toISOString() || new Date().toISOString(),
+                images: product.images?.map(img => ({
+                    ...img,
+                    createdAt: img.createdAt?.toISOString() || new Date().toISOString(),
+                    updatedAt: img.updatedAt?.toISOString() || new Date().toISOString(),
+                })) || [],
+                categories: product.categories?.map(cat => ({
+                    ...cat,
+                    category: cat.category ? {
+                        ...cat.category,
+                        createdAt: cat.category.createdAt?.toISOString() || new Date().toISOString(),
+                        updatedAt: cat.category.updatedAt?.toISOString() || new Date().toISOString(),
+                    } : { name: "N/A", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+                })) || [],
+                brand: product.brand ? {
+                    ...product.brand,
+                    createdAt: product.brand.createdAt?.toISOString() || new Date().toISOString(),
+                    updatedAt: product.brand.updatedAt?.toISOString() || new Date().toISOString(),
+                } : undefined
+            })) as any,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages,
+            },
+        };
     } catch (error) {
         console.error("[Service Product] getAdminProducts Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };

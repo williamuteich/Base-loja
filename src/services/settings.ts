@@ -2,11 +2,12 @@
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
+import { getOrCreateStoreConfig } from "@/lib/store-config";
+
 export async function getSettings() {
     try {
-        const res = await fetch(`${API_URL}/api/private/settings`, { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to fetch settings");
-        return await res.json();
+        const config = await getOrCreateStoreConfig();
+        return JSON.parse(JSON.stringify(config));
     } catch (error) {
         console.error("[Service Settings] getSettings Error:", error);
         return null;

@@ -5,15 +5,24 @@ import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
+import { prisma } from "@/lib/prisma";
+
 export async function getPublicSocialMedias(): Promise<SocialMedia[]> {
     "use cache";
     cacheTag("store-config");
     cacheLife("hours");
 
     try {
-        const res = await fetch(`${API_URL}/api/public/social-media`);
-        if (!res.ok) throw new Error("Failed to fetch public social medias");
-        return await res.json();
+        const socialMediasRaw = await prisma.socialMedia.findMany({
+            where: { isActive: true },
+            orderBy: { platform: 'asc' }
+        });
+
+        return socialMediasRaw.map(sm => ({
+            ...sm,
+            createdAt: sm.createdAt.toISOString(),
+            updatedAt: sm.updatedAt.toISOString(),
+        }));
     } catch (error) {
         console.error("[Service SocialMedia] getPublicSocialMedias Error:", error);
         return [];
@@ -22,14 +31,38 @@ export async function getPublicSocialMedias(): Promise<SocialMedia[]> {
 
 export async function getAdminSocialMedias(page: number = 1, limit: number = 10, search: string = ""): Promise<SocialMediaResponse> {
     try {
-        const url = new URL(`${API_URL}/api/private/social-media`);
-        url.searchParams.set("page", page.toString());
-        url.searchParams.set("limit", limit.toString());
-        if (search) url.searchParams.set("search", search);
+        const skip = (page - 1) * limit;
+        const where: any = {};
 
-        const res = await fetch(url.toString(), { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to fetch social medias");
-        return await res.json();
+        if (search) {
+            where.platform = { contains: search };
+        }
+
+        const [data, total] = await Promise.all([
+            prisma.socialMedia.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { platform: "asc" },
+            }),
+            prisma.socialMedia.count({ where }),
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: data.map(sm => ({
+                ...sm,
+                createdAt: sm.createdAt.toISOString(),
+                updatedAt: sm.updatedAt.toISOString(),
+            })),
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages,
+            },
+        };
     } catch (error) {
         console.error("[Service SocialMedia] getAdminSocialMedias Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };

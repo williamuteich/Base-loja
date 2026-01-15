@@ -90,15 +90,15 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
 
     return (
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 pt-4">
-            <div className="lg:col-span-7 space-y-4">
-                <div className="relative aspect-4/5 md:aspect-square lg:aspect-4/5 rounded-[2rem] overflow-hidden bg-rose-50/30 border border-rose-100/50 shadow-sm">
+            <div className="lg:col-span-6 space-y-4">
+                <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-white/50 border border-slate-100 shadow-sm">
                     {images.length > 0 ? (
                         <Image
                             src={`${backendUrl}/${images[selectedImageIndex].url}`}
                             alt={product.title}
                             fill
                             priority
-                            className="object-cover hover:scale-105 transition-transform duration-700"
+                            className="object-contain"
                             unoptimized
                         />
                     ) : (
@@ -135,7 +135,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                     src={`${backendUrl}/${image.url}`}
                                     alt={`Visualização ${i + 1}`}
                                     fill
-                                    className="object-cover"
+                                    className="object-contain"
                                     unoptimized
                                 />
                             </button>
@@ -144,7 +144,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                 )}
             </div>
 
-            <div className="lg:col-span-5 flex flex-col">
+            <div className="lg:col-span-6 flex flex-col">
                 <div className="sticky top-8 space-y-8">
                     <div className="space-y-4">
                         <h1 className="text-3xl lg:text-4xl font-semibold text-slate-900 leading-tight">

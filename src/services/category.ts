@@ -8,7 +8,7 @@ const API_URL = process.env.API_URL || "http://localhost:3000";
 export async function getPublicCategories(homeOnly: boolean = false, includeProducts: boolean = false): Promise<Category[]> {
     try {
         const url = new URL(`${API_URL}/api/public/category`);
-        if (homeOnly) url.searchParams.set("homeOnly", "true");
+        url.searchParams.set("homeOnly", homeOnly ? "true" : "false");
         if (includeProducts) url.searchParams.set("includeProducts", "true");
 
         const res = await fetch(url.toString(), { next: { tags: ["categories"] } });

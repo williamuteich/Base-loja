@@ -90,7 +90,6 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
 
     return (
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 pt-4">
-            {/* Gallery Section */}
             <div className="lg:col-span-7 space-y-4">
                 <div className="relative aspect-4/5 md:aspect-square lg:aspect-4/5 rounded-[2rem] overflow-hidden bg-rose-50/30 border border-rose-100/50 shadow-sm">
                     {images.length > 0 ? (

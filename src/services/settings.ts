@@ -1,8 +1,22 @@
 "use server";
 
+import { StoreConfig } from "@/types/store-config";
 import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
+
+export async function getPublicSettings(): Promise<StoreConfig | null> {
+    try {
+        const res = await fetch(`${API_URL}/api/public/store-configuration`, {
+            next: { tags: ["store-config"] }
+        });
+        if (!res.ok) throw new Error("Failed to fetch public settings");
+        return await res.json();
+    } catch (error) {
+        console.error("[Service Settings] getPublicSettings Error:", error);
+        return null;
+    }
+}
 
 export async function getSettings() {
     try {

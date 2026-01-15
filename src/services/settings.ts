@@ -1,13 +1,20 @@
 "use server";
 
-const API_URL = process.env.API_URL || "http://localhost:3000";
+import { cookies } from "next/headers";
 
-import { getOrCreateStoreConfig } from "@/lib/store-config";
+const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getSettings() {
     try {
-        const config = await getOrCreateStoreConfig();
-        return JSON.parse(JSON.stringify(config));
+        const cookieStore = await cookies();
+        const res = await fetch(`${API_URL}/api/private/settings`, {
+            cache: "no-store",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
+        });
+        if (!res.ok) throw new Error("Failed to fetch settings");
+        return await res.json();
     } catch (error) {
         console.error("[Service Settings] getSettings Error:", error);
         return null;
@@ -16,9 +23,13 @@ export async function getSettings() {
 
 export async function updateSettings(data: any) {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/settings`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Cookie: cookieStore.toString()
+            },
             body: JSON.stringify(data),
         });
 

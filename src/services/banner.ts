@@ -1,28 +1,15 @@
 "use server";
 
 import { Banner, BannersResponse } from "@/types/banner";
-import { cacheTag, cacheLife } from "next/cache";
-import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicBanners(): Promise<Banner[]> {
-    "use cache";
-    cacheTag("banners");
-    cacheLife("hours");
-
     try {
-        const bannersRaw = await prisma.banner.findMany({
-            where: { isActive: true },
-            orderBy: { createdAt: 'desc' }
-        });
-
-        return bannersRaw.map(banner => ({
-            ...banner,
-            createdAt: banner.createdAt.toISOString(),
-            updatedAt: banner.updatedAt.toISOString(),
-        }));
+        const res = await fetch(`${API_URL}/api/public/banner`, { next: { tags: ["banners"] } });
+        if (!res.ok) throw new Error("Failed to fetch public banners");
+        return await res.json();
     } catch (error) {
         console.error("Error fetching public banners:", error);
         return [];
@@ -31,41 +18,20 @@ export async function getPublicBanners(): Promise<Banner[]> {
 
 export async function getAdminBanners(page: number = 1, limit: number = 10, search: string = ""): Promise<BannersResponse> {
     try {
-        const skip = (page - 1) * limit;
-        const where: any = {};
+        const cookieStore = await cookies();
+        const url = new URL(`${API_URL}/api/private/banner`);
+        url.searchParams.set("page", page.toString());
+        url.searchParams.set("limit", limit.toString());
+        if (search) url.searchParams.set("search", search);
 
-        if (search) {
-            where.OR = [
-                { title: { contains: search } },
-                { subtitle: { contains: search } }
-            ];
-        }
-
-        const [data, total] = await Promise.all([
-            prisma.banner.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: { createdAt: "desc" },
-            }),
-            prisma.banner.count({ where }),
-        ]);
-
-        const totalPages = Math.ceil(total / limit);
-
-        return {
-            data: data.map(banner => ({
-                ...banner,
-                createdAt: banner.createdAt.toISOString(),
-                updatedAt: banner.updatedAt.toISOString(),
-            })),
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages,
-            },
-        };
+        const res = await fetch(url.toString(), {
+            cache: "no-store",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
+        });
+        if (!res.ok) throw new Error("Failed to fetch admin banners");
+        return await res.json();
     } catch (error) {
         console.error("[Service Banner] getAdminBanners Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };

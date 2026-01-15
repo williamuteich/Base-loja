@@ -1,28 +1,15 @@
 "use server";
 
 import { Brand, BrandsResponse } from "@/types/brand";
-import { cacheTag, cacheLife } from "next/cache";
-import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicBrands(): Promise<Brand[]> {
-    "use cache";
-    cacheTag("brands");
-    cacheLife("hours");
-
     try {
-        const brandsRaw = await prisma.brand.findMany({
-            where: { isActive: true },
-            orderBy: { name: 'asc' }
-        });
-
-        return brandsRaw.map(brand => ({
-            ...brand,
-            createdAt: brand.createdAt.toISOString(),
-            updatedAt: brand.updatedAt.toISOString(),
-        }));
+        const res = await fetch(`${API_URL}/api/public/brand`, { next: { tags: ["brands"] } });
+        if (!res.ok) throw new Error("Failed to fetch public brands");
+        return await res.json();
     } catch (error) {
         console.error("[Service Brand] getPublicBrands Error:", error);
         return [];
@@ -31,38 +18,20 @@ export async function getPublicBrands(): Promise<Brand[]> {
 
 export async function getAdminBrands(page: number = 1, limit: number = 10, search: string = ""): Promise<BrandsResponse> {
     try {
-        const skip = (page - 1) * limit;
-        const where: any = {};
+        const cookieStore = await cookies();
+        const url = new URL(`${API_URL}/api/private/brand`);
+        url.searchParams.set("page", page.toString());
+        url.searchParams.set("limit", limit.toString());
+        if (search) url.searchParams.set("search", search);
 
-        if (search) {
-            where.name = { contains: search };
-        }
-
-        const [data, total] = await Promise.all([
-            prisma.brand.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: { name: 'asc' }
-            }),
-            prisma.brand.count({ where })
-        ]);
-
-        const totalPages = Math.ceil(total / limit);
-
-        return {
-            data: data.map(brand => ({
-                ...brand,
-                createdAt: brand.createdAt.toISOString(),
-                updatedAt: brand.updatedAt.toISOString(),
-            })),
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages
+        const res = await fetch(url.toString(), {
+            cache: "no-store",
+            headers: {
+                Cookie: cookieStore.toString()
             }
-        };
+        });
+        if (!res.ok) throw new Error("Failed to fetch admin brands");
+        return await res.json();
     } catch (error) {
         console.error("[Service Brand] getAdminBrands Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };

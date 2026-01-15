@@ -1,55 +1,19 @@
 "use server";
 
 import { Category, CategoriesResponse } from "@/types/category";
-import { cacheTag, cacheLife } from "next/cache";
-import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicCategories(homeOnly: boolean = false, includeProducts: boolean = false): Promise<Category[]> {
-    "use cache";
-    cacheTag("categories");
-    if (includeProducts) cacheTag("products");
-    cacheLife("hours");
-
     try {
-        const categoriesRaw = await prisma.category.findMany({
-            where: {
-                isActive: true,
-                ...(homeOnly ? { isHome: true } : {})
-            },
-            include: {
-                products: includeProducts ? {
-                    include: {
-                        product: {
-                            include: {
-                                images: true
-                            }
-                        }
-                    }
-                } : false
-            },
-            orderBy: { name: 'asc' }
-        });
+        const url = new URL(`${API_URL}/api/public/category`);
+        if (homeOnly) url.searchParams.set("homeOnly", "true");
+        if (includeProducts) url.searchParams.set("includeProducts", "true");
 
-        return categoriesRaw.map(category => ({
-            ...category,
-            createdAt: category.createdAt.toISOString(),
-            updatedAt: category.updatedAt.toISOString(),
-            products: category.products ? (category.products as any[]).map(p => ({
-                ...p,
-                product: p.product ? {
-                    ...p.product,
-                    createdAt: p.product.createdAt?.toISOString() || new Date().toISOString(),
-                    images: p.product.images?.map((img: any) => ({
-                        ...img,
-                        createdAt: img.createdAt?.toISOString() || new Date().toISOString(),
-                        updatedAt: img.updatedAt?.toISOString() || new Date().toISOString(),
-                    })) || []
-                } : null
-            })).filter(p => p.product !== null) : undefined
-        })) as any;
+        const res = await fetch(url.toString(), { next: { tags: ["categories"] } });
+        if (!res.ok) throw new Error("Failed to fetch public categories");
+        return await res.json();
     } catch (error) {
         console.error("[Service Category] getPublicCategories Error:", error);
         return [];
@@ -58,42 +22,20 @@ export async function getPublicCategories(homeOnly: boolean = false, includeProd
 
 export async function getAdminCategories(page: number = 1, limit: number = 10, search: string = ""): Promise<CategoriesResponse> {
     try {
-        const skip = (page - 1) * limit;
-        const where: any = {};
+        const cookieStore = await cookies();
+        const url = new URL(`${API_URL}/api/private/category`);
+        url.searchParams.set("page", page.toString());
+        url.searchParams.set("limit", limit.toString());
+        if (search) url.searchParams.set("search", search);
 
-        if (search) {
-            where.name = { contains: search };
-        }
-
-        const [data, total] = await Promise.all([
-            prisma.category.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: { name: 'asc' },
-                include: {
-                    _count: {
-                        select: { products: true }
-                    }
-                }
-            }),
-            prisma.category.count({ where })
-        ]);
-
-        const totalPages = Math.ceil(total / limit);
-
-        return {
-            data: data.map(c => ({
-                ...c,
-                _count: c._count || { products: 0 }
-            })) as any,
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages
+        const res = await fetch(url.toString(), {
+            cache: "no-store",
+            headers: {
+                Cookie: cookieStore.toString()
             }
-        };
+        });
+        if (!res.ok) throw new Error("Failed to fetch admin categories");
+        return await res.json();
     } catch (error) {
         console.error("[Service Category] getAdminCategories Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };

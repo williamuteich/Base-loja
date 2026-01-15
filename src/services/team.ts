@@ -1,6 +1,7 @@
 "use server";
 
 import { TeamMember } from "@/types/team";
+import { cookies } from "next/headers";
 
 export interface TeamResponse {
     data: TeamMember[];
@@ -14,45 +15,22 @@ export interface TeamResponse {
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
-import { prisma } from "@/lib/prisma";
-
 export async function getAdminTeam(page: number = 1, limit: number = 10, search: string = ""): Promise<TeamResponse> {
     try {
-        const skip = (page - 1) * limit;
-        const where: any = {};
+        const cookieStore = await cookies();
+        const url = new URL(`${API_URL}/api/private/team`);
+        url.searchParams.set("page", page.toString());
+        url.searchParams.set("limit", limit.toString());
+        if (search) url.searchParams.set("search", search);
 
-        if (search) {
-            where.OR = [
-                { name: { contains: search } },
-                { role: { contains: search } }
-            ];
-        }
-
-        const [data, total] = await Promise.all([
-            prisma.team.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: { name: "asc" },
-            }),
-            prisma.team.count({ where }),
-        ]);
-
-        const totalPages = Math.ceil(total / limit);
-
-        return {
-            data: data.map((member: any) => ({
-                ...member,
-                createdAt: member.createdAt.toISOString(),
-                updatedAt: member.updatedAt.toISOString(),
-            })),
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages,
-            },
-        };
+        const res = await fetch(url.toString(), {
+            cache: "no-store",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
+        });
+        if (!res.ok) throw new Error("Falha ao buscar equipe");
+        return await res.json();
     } catch (error) {
         console.error("[Service Team] getAdminTeam Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
@@ -61,10 +39,12 @@ export async function getAdminTeam(page: number = 1, limit: number = 10, search:
 
 export async function createTeamMember(data: any): Promise<TeamMember | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/team`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Cookie: cookieStore.toString()
             },
             body: JSON.stringify(data),
         });
@@ -83,10 +63,12 @@ export async function createTeamMember(data: any): Promise<TeamMember | null> {
 
 export async function updateTeamMember(id: string, data: any): Promise<TeamMember | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/team/${id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
+                Cookie: cookieStore.toString()
             },
             body: JSON.stringify(data),
         });
@@ -105,8 +87,12 @@ export async function updateTeamMember(id: string, data: any): Promise<TeamMembe
 
 export async function deleteTeamMember(id: string): Promise<boolean> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/team/${id}`, {
             method: "DELETE",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
         });
 
         if (!res.ok) {

@@ -1,28 +1,15 @@
 "use server";
 
 import { SocialMedia, SocialMediaResponse } from "@/types/social-media";
-import { cacheTag, cacheLife } from "next/cache";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
-import { prisma } from "@/lib/prisma";
-
 export async function getPublicSocialMedias(): Promise<SocialMedia[]> {
-    "use cache";
-    cacheTag("store-config");
-    cacheLife("hours");
-
     try {
-        const socialMediasRaw = await prisma.socialMedia.findMany({
-            where: { isActive: true },
-            orderBy: { platform: 'asc' }
-        });
-
-        return socialMediasRaw.map(sm => ({
-            ...sm,
-            createdAt: sm.createdAt.toISOString(),
-            updatedAt: sm.updatedAt.toISOString(),
-        }));
+        const res = await fetch(`${API_URL}/api/public/social-media`, { next: { tags: ["store-config"] } });
+        if (!res.ok) throw new Error("Failed to fetch public social medias");
+        return await res.json();
     } catch (error) {
         console.error("[Service SocialMedia] getPublicSocialMedias Error:", error);
         return [];
@@ -31,38 +18,20 @@ export async function getPublicSocialMedias(): Promise<SocialMedia[]> {
 
 export async function getAdminSocialMedias(page: number = 1, limit: number = 10, search: string = ""): Promise<SocialMediaResponse> {
     try {
-        const skip = (page - 1) * limit;
-        const where: any = {};
+        const cookieStore = await cookies();
+        const url = new URL(`${API_URL}/api/private/social-media`);
+        url.searchParams.set("page", page.toString());
+        url.searchParams.set("limit", limit.toString());
+        if (search) url.searchParams.set("search", search);
 
-        if (search) {
-            where.platform = { contains: search };
-        }
-
-        const [data, total] = await Promise.all([
-            prisma.socialMedia.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: { platform: "asc" },
-            }),
-            prisma.socialMedia.count({ where }),
-        ]);
-
-        const totalPages = Math.ceil(total / limit);
-
-        return {
-            data: data.map(sm => ({
-                ...sm,
-                createdAt: sm.createdAt.toISOString(),
-                updatedAt: sm.updatedAt.toISOString(),
-            })),
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages,
-            },
-        };
+        const res = await fetch(url.toString(), {
+            cache: "no-store",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
+        });
+        if (!res.ok) throw new Error("Failed to fetch social medias");
+        return await res.json();
     } catch (error) {
         console.error("[Service SocialMedia] getAdminSocialMedias Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
@@ -71,9 +40,13 @@ export async function getAdminSocialMedias(page: number = 1, limit: number = 10,
 
 export async function createSocialMedia(data: { platform: string; url: string; isActive?: boolean }): Promise<SocialMedia | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/social-media`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Cookie: cookieStore.toString()
+            },
             body: JSON.stringify(data),
         });
 
@@ -91,9 +64,13 @@ export async function createSocialMedia(data: { platform: string; url: string; i
 
 export async function updateSocialMedia(id: string, data: { platform?: string; url?: string; isActive?: boolean }): Promise<SocialMedia | null> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/social-media/${id}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Cookie: cookieStore.toString()
+            },
             body: JSON.stringify(data),
         });
 
@@ -111,8 +88,12 @@ export async function updateSocialMedia(id: string, data: { platform?: string; u
 
 export async function deleteSocialMedia(id: string): Promise<boolean> {
     try {
+        const cookieStore = await cookies();
         const res = await fetch(`${API_URL}/api/private/social-media/${id}`, {
             method: "DELETE",
+            headers: {
+                Cookie: cookieStore.toString()
+            }
         });
 
         if (!res.ok) {

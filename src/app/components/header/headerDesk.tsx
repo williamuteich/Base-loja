@@ -28,10 +28,6 @@ export default function HeaderDesk({ contactSlot, seoSlot, socialSlot, brandSlot
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const handleSearch = (term: string) => {
-        console.log("Searching for:", term);
-    };
-
     return (
         <header className="fixed top-0 left-0 z-50 w-full transition-all duration-400 bg-white hidden lg:block">
             <div
@@ -57,7 +53,7 @@ export default function HeaderDesk({ contactSlot, seoSlot, socialSlot, brandSlot
                         {brandSlot}
 
                         <div className="flex-1 max-w-2xl px-4">
-                            <SearchHeader onSearch={handleSearch} />
+                            <SearchHeader />
                         </div>
 
                         <nav className="flex items-center gap-1 shrink-0">

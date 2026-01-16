@@ -10,13 +10,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  search,
 }: Readonly<{
   children: React.ReactNode;
+  search: React.ReactNode;
 }>) {
   return (
     <html lang="pt-BR">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          {search}
+        </Providers>
       </body>
     </html>
   );

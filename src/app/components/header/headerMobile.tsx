@@ -37,10 +37,6 @@ export default function HeaderMobile({ brandSlot, menuBrandSlot, socialSlot }: H
         setIsMobileSearchOpen(!isMobileSearchOpen);
     };
 
-    const handleSearch = (term: string) => {
-        console.log("Searching for:", term);
-    };
-
     return (
         <header className="fixed top-0 left-0 z-50 w-full transition-all duration-400 bg-white lg:hidden">
             <div className="bg-white/95 backdrop-blur-sm border-b border-slate-100 shadow-sm relative z-40 overflow-hidden">
@@ -128,7 +124,7 @@ export default function HeaderMobile({ brandSlot, menuBrandSlot, socialSlot }: H
                         !isMobileSearchOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
                     )}>
                         <div className="relative w-full flex items-center gap-2">
-                            <SearchHeader onSearch={handleSearch} className="flex-1" />
+                            <SearchHeader className="flex-1" />
                             <button
                                 onClick={toggleMobileSearch}
                                 className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-pink-700 hover:bg-pink-50 rounded-xl transition-all shrink-0"

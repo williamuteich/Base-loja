@@ -1,32 +1,61 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
-
-interface SearchHeaderProps {
-    className?: string;
-    placeholder?: string;
-    onSearch?: (term: string) => void;
-}
 
 export default function SearchHeader({
     className,
     placeholder = "O que você está procurando hoje?",
-    onSearch
-}: SearchHeaderProps) {
-    const [value, setValue] = useState("");
+}: { className?: string; placeholder?: string }) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const [value, setValue] = useState(searchParams.get("q") || "");
     const debouncedValue = useDebounce(value, 500);
+    const isFirstRender = useRef(true);
+    const isSyncingFromUrl = useRef(false);
 
     useEffect(() => {
-        if (onSearch) {
-            onSearch(debouncedValue);
+        const q = searchParams.get("q") || "";
+        if (q !== value) {
+            isSyncingFromUrl.current = true;
+            setValue(q);
         }
-    }, [debouncedValue, onSearch]);
+    }, [searchParams]);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        if (isSyncingFromUrl.current) {
+            isSyncingFromUrl.current = false;
+            return;
+        }
+
+        const currentQ = searchParams.get("q") || "";
+        if (debouncedValue !== currentQ) {
+            const params = new URLSearchParams(searchParams.toString());
+            if (debouncedValue.trim()) {
+                params.set("q", debouncedValue);
+            } else {
+                params.delete("q");
+            }
+
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }
+    }, [debouncedValue, pathname, router]);
 
     const handleClear = () => {
         setValue("");
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("q");
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
     return (

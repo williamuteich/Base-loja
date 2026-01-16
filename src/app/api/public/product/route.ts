@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
     } catch (error) {
         console.error("[API Public Product] Error fetching products:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Erro Interno do Servidor" },
             { status: 500 }
         );
     }

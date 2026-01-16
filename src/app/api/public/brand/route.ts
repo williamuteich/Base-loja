@@ -24,7 +24,7 @@ export async function GET() {
     } catch (error) {
         console.error("[API Public Brand] GET Error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Erro Interno do Servidor" },
             { status: 500 }
         );
     }

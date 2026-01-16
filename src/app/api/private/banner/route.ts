@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         console.error("[API Private Banner] GET Error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Erro Interno do Servidor" },
             { status: 500 }
         );
     }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
         if (!title) {
             return NextResponse.json(
-                { error: "Title is required" },
+                { error: "O título é obrigatório" },
                 { status: 400 }
             );
         }
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error("[API Private Banner] POST Error:", error);
         return NextResponse.json(
-            { error: "Failed to create banner" },
+            { error: "Falha ao criar banner" },
             { status: 500 }
         );
     }

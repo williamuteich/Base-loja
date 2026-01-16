@@ -74,6 +74,6 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(categories);
     } catch (error) {
         console.error("Public Category list error:", error);
-        return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });
+        return NextResponse.json({ error: "Falha ao buscar categorias" }, { status: 500 });
     }
 }

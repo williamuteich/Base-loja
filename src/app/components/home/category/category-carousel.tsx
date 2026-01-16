@@ -33,33 +33,44 @@ export default function CategoryCarousel({ categories, backendUrl }: CategoryCar
                             href={`/produtos?categoria=${category.name}`}
                             className="group/card relative flex-none w-32 md:w-44 lg:w-52 snap-start"
                         >
-                            <div className="relative aspect-square rounded-2xl overflow-hidden shadow-sm group-hover/card:shadow-lg transition-all duration-500 border border-slate-100 bg-white">
+                            <div className="relative aspect-3/4 md:aspect-square rounded-[2rem] overflow-hidden shadow-sm group-hover/card:shadow-2xl transition-all duration-700 border border-slate-100/50 bg-slate-50">
                                 {category.imageUrl ? (
                                     <Image
                                         src={`${backendUrl}/${category.imageUrl}`}
                                         alt={category.name}
                                         fill
-                                        sizes="(max-width: 768px) 128px, (max-width: 1024px) 176px, 208px"
-                                        className="object-cover group-hover/card:scale-110 transition-transform duration-700"
+                                        sizes="(max-width: 768px) 140px, (max-width: 1024px) 190px, 220px"
+                                        className="object-cover group-hover/card:scale-110 transition-transform duration-1000 ease-out"
                                         priority={i < 4}
                                         unoptimized
                                     />
                                 ) : (
-                                    <div className="absolute inset-0 bg-slate-100 flex items-center justify-center text-slate-400">
-                                        <span className="text-[10px] uppercase font-medium text-center px-1">
-                                            Sem imagem
-                                        </span>
+                                    <div className="absolute inset-0 bg-slate-50 flex items-center justify-center text-slate-300">
+                                        <div className="text-center p-4">
+                                            <div className="w-12 h-12 rounded-full bg-slate-100 mx-auto flex items-center justify-center mb-2">
+                                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-[10px] uppercase font-bold tracking-wider">
+                                                Sem imagem
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
 
-                                <div className="absolute inset-0 bg-black/25 backdrop-blur-[1px] flex flex-col items-center justify-center p-4 text-center group-hover/card:bg-black/40 group-hover/card:backdrop-blur-xs transition-all duration-500">
-                                    <h3 className="text-white font-bold text-base md:text-xl lg:text-2xl mb-1 line-clamp-2 capitalize drop-shadow-xl transform group-hover/card:scale-105 transition-transform duration-500 px-2 leading-tight">
+                                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover/card:opacity-80 transition-opacity duration-500" />
+
+                                <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end text-center group-hover/card:translate-y-[-4px] transition-transform duration-500">
+                                    <h3 className="text-white font-black text-lg md:text-2xl mb-2 line-clamp-2 capitalize leading-none tracking-tight">
                                         {category.name}
                                     </h3>
-                                    <span className="text-white/80 text-[10px] md:text-xs lg:text-sm uppercase tracking-widest font-bold block drop-shadow-md">
-                                        {category._count?.products || 0}{" "}
-                                        {(category._count?.products || 0) === 1 ? "item" : "itens"}
-                                    </span>
+
+                                    <div className="flex items-center justify-center gap-2 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 delay-100">
+                                        <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/10 text-[10px] sm:text-xs font-bold text-white uppercase tracking-widest">
+                                            {category._count?.products || 0} modelos
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </Link>

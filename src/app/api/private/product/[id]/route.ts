@@ -24,13 +24,13 @@ export async function GET(
         });
 
         if (!product) {
-            return NextResponse.json({ error: "Product not found" }, { status: 404 });
+            return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
         }
 
         return NextResponse.json(product);
     } catch (error) {
         console.error("[API Private Product ID] GET Error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "Erro Interno do Servidor" }, { status: 500 });
     }
 }
 

@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
         });
     } catch (error) {
         console.error("Private Category list error:", error);
-        return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });
+        return NextResponse.json({ error: "Falha ao buscar categorias" }, { status: 500 });
     }
 }
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         const imageFile = formData.get("file") as File;
 
         if (!name) {
-            return NextResponse.json({ error: "Name is required" }, { status: 400 });
+            return NextResponse.json({ error: "O nome é obrigatório" }, { status: 400 });
         }
 
         let imageUrl = null;
@@ -85,8 +85,8 @@ export async function POST(req: NextRequest) {
             code: error.code,
         });
         if (error.code === 'P2002') {
-            return NextResponse.json({ error: "A category with this name already exists" }, { status: 409 });
+            return NextResponse.json({ error: "Já existe uma categoria com este nome" }, { status: 409 });
         }
-        return NextResponse.json({ error: error.message || "Failed to create category" }, { status: 500 });
+        return NextResponse.json({ error: error.message || "Falha ao criar categoria" }, { status: 500 });
     }
 }

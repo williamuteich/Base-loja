@@ -13,7 +13,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         });
 
         if (!existing) {
-            return NextResponse.json({ error: "Category not found" }, { status: 404 });
+            return NextResponse.json({ error: "Categoria não encontrada" }, { status: 404 });
         }
 
         const name = formData.get("name") as string;
@@ -49,9 +49,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             code: error.code,
         });
         if (error.code === 'P2002') {
-            return NextResponse.json({ error: "A category with this name already exists" }, { status: 409 });
+            return NextResponse.json({ error: "Já existe uma categoria com este nome" }, { status: 409 });
         }
-        return NextResponse.json({ error: error.message || "Failed to update category" }, { status: 500 });
+        return NextResponse.json({ error: error.message || "Falha ao atualizar categoria" }, { status: 500 });
     }
 }
 
@@ -69,12 +69,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         });
 
         if (!category) {
-            return NextResponse.json({ error: "Category not found" }, { status: 404 });
+            return NextResponse.json({ error: "Categoria não encontrada" }, { status: 404 });
         }
 
         if (category._count.products > 0) {
             return NextResponse.json({
-                error: `Cannot delete category with ${category._count.products} linked products.`
+                error: `Não é possível excluir esta categoria pois existem ${category._count.products} produtos vinculados a ela.`
             }, { status: 400 });
         }
 
@@ -84,9 +84,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
         revalidateTag("categories", { expire: 0 });
 
-        return NextResponse.json({ message: "Category deleted successfully" });
+        return NextResponse.json({ message: "Categoria excluída com sucesso" });
     } catch (error) {
         console.error("Private Category delete error:", error);
-        return NextResponse.json({ error: "Failed to delete category" }, { status: 500 });
+        return NextResponse.json({ error: "Falha ao excluir categoria" }, { status: 500 });
     }
 }

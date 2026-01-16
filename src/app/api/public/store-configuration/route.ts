@@ -21,14 +21,14 @@ export async function GET() {
         const config = await getCachedConfig();
 
         if (!config) {
-            return NextResponse.json({ error: "Store configuration not found" }, { status: 404 });
+            return NextResponse.json({ error: "Configuração da loja não encontrada" }, { status: 404 });
         }
 
         return NextResponse.json(config);
     } catch (error) {
         console.error("[API Public Store Config] GET Error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Erro Interno do Servidor" },
             { status: 500 }
         );
     }

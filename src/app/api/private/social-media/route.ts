@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         console.error("[API Private Social Media] GET Error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Erro Interno do Servidor" },
             { status: 500 }
         );
     }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
         if (!platform || !url) {
             return NextResponse.json(
-                { error: "Platform and URL are required" },
+                { error: "Plataforma e URL são obrigatórias" },
                 { status: 400 }
             );
         }
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
             );
         }
         return NextResponse.json(
-            { error: "Failed to create social media" },
+            { error: "Falha ao criar rede social" },
             { status: 500 }
         );
     }

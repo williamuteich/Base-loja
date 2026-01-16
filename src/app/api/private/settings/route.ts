@@ -10,7 +10,7 @@ export async function GET() {
     } catch (error) {
         console.error("[API Private Settings] GET Error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Erro Interno do Servidor" },
             { status: 500 }
         );
     }
@@ -52,7 +52,7 @@ export async function PATCH(request: NextRequest) {
     } catch (error) {
         console.error("[API Private Settings] PATCH Error:", error);
         return NextResponse.json(
-            { error: "Failed to update settings" },
+            { error: "Falha ao atualizar configurações" },
             { status: 500 }
         );
     }

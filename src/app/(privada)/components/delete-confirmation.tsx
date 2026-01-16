@@ -32,14 +32,14 @@ export default function DeleteConfirmation({
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <button
                     onClick={onCancel}
-                    className="w-full sm:w-auto px-8 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200"
+                    className="w-full sm:w-auto cursor-pointer px-8 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200"
                     disabled={isDeleting}
                 >
                     Não, cancelar
                 </button>
                 <button
                     onClick={onConfirm}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-2.5 bg-rose-500 text-white rounded-xl text-sm font-bold hover:bg-rose-600 shadow-md shadow-rose-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-2 px-8 py-2.5 bg-rose-500 text-white rounded-xl text-sm font-bold hover:bg-rose-600 shadow-md shadow-rose-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                     disabled={isDeleting}
                 >
                     {isDeleting ? (

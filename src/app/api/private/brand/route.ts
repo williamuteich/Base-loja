@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         console.error("[API Private Brand] GET Error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Erro Interno do Servidor" },
             { status: 500 }
         );
     }

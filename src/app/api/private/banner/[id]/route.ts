@@ -16,7 +16,7 @@ export async function PATCH(
         });
 
         if (!existing) {
-            return NextResponse.json({ error: "Banner not found" }, { status: 404 });
+            return NextResponse.json({ error: "Banner não encontrado" }, { status: 404 });
         }
 
         const title = formData.get("title") as string | null;
@@ -62,7 +62,7 @@ export async function PATCH(
     } catch (error) {
         console.error("[API Private Banner PATCH] Error:", error);
         return NextResponse.json(
-            { error: "Failed to update banner" },
+            { error: "Falha ao atualizar banner" },
             { status: 500 }
         );
     }
@@ -80,7 +80,7 @@ export async function DELETE(
         });
 
         if (!existing) {
-            return NextResponse.json({ error: "Banner not found" }, { status: 404 });
+            return NextResponse.json({ error: "Banner não encontrado" }, { status: 404 });
         }
 
         if (existing.imageDesktop) {
@@ -97,11 +97,11 @@ export async function DELETE(
 
         revalidateTag("banners", { expire: 10 });
 
-        return NextResponse.json({ message: "Banner deleted successfully" });
+        return NextResponse.json({ message: "Banner excluído com sucesso" });
     } catch (error) {
         console.error("[API Private Banner DELETE] Error:", error);
         return NextResponse.json(
-            { error: "Failed to delete banner" },
+            { error: "Falha ao excluir banner" },
             { status: 500 }
         );
     }

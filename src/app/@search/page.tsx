@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getPaginatedPublicProducts } from "@/services/product";
 import ProductCard from "@/app/components/home/products/product-card";
 import { Search } from "lucide-react";
 import SearchOverlayClient from "./SearchOverlayClient";
@@ -14,24 +14,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
     if (!query) return null;
 
-    const products = await prisma.product.findMany({
-        where: {
-            isActive: true,
-            OR: [
-                { title: { contains: query } },
-                { description: { contains: query } }
-            ]
-        },
-        include: {
-            images: true,
-            categories: {
-                include: {
-                    category: true
-                }
-            }
-        },
-        take: 12
-    });
+    const { data: products } = await getPaginatedPublicProducts(1, 12, undefined, query);
 
     const backendUrl = process.env.API_URL || "http://localhost:3000";
 

@@ -33,7 +33,7 @@ export async function PATCH(
             );
         }
         return NextResponse.json(
-            { error: "Failed to update social media" },
+            { error: "Falha ao atualizar rede social" },
             { status: 500 }
         );
     }
@@ -52,12 +52,12 @@ export async function DELETE(
 
         revalidateTag("store-config", { expire: 0 });
 
-        return NextResponse.json({ message: "Social media deleted successfully" });
+        return NextResponse.json({ message: "Rede social removida com sucesso" });
 
     } catch (error) {
         console.error("[API Private Social Media] DELETE Error:", error);
         return NextResponse.json(
-            { error: "Failed to delete social media" },
+            { error: "Falha ao remover rede social" },
             { status: 500 }
         );
     }

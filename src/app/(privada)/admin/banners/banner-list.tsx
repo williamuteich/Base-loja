@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Banner } from "@/types/banner";
-import { getAdminBanners, BannersResponse, createBanner, updateBanner, deleteBanner } from "@/services/banner";
+import { Banner, BannersResponse } from "@/types/banner";
+import { getAdminBanners, createBanner, updateBanner, deleteBanner } from "@/services/banner";
 import { ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
-// Reorganized Components
 import SkeletonBanner from "./components/skeleton-banner";
 import BannerForm from "./components/banner-form";
 import BannerCard from "./components/banner-card";

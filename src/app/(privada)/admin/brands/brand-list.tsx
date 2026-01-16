@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Brand } from "@/types/brand";
-import { getAdminBrands, createBrand, updateBrand, deleteBrand, BrandsResponse } from "@/services/brand";
+import { Brand, BrandsResponse } from "@/types/brand";
+import { getAdminBrands, createBrand, updateBrand, deleteBrand } from "@/services/brand";
 import { toast } from "sonner";
 import { Package, SquarePen, Trash2 } from "lucide-react";
 import BrandHeader from "./components/brand-header";

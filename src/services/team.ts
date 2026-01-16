@@ -1,17 +1,7 @@
 "use server";
 
-import { TeamMember } from "@/types/team";
+import { TeamMember, TeamResponse } from "@/types/team";
 import { cookies } from "next/headers";
-
-export interface TeamResponse {
-    data: TeamMember[];
-    meta: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
-}
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 

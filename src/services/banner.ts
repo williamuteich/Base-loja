@@ -1,7 +1,7 @@
 "use server";
 
 import { Banner, BannersResponse } from "@/types/banner";
-export type { BannersResponse };
+
 import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";

@@ -10,3 +10,13 @@ export interface TeamMember {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface TeamResponse {
+    data: TeamMember[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}

@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { TeamMember } from "@/types/team";
-import { getAdminTeam, createTeamMember, updateTeamMember, deleteTeamMember, TeamResponse } from "@/services/team";
+import { TeamMember, TeamResponse } from "@/types/team";
+import { getAdminTeam, createTeamMember, updateTeamMember, deleteTeamMember } from "@/services/team";
 import TeamHeader from "./components/team-header";
 import TeamCard from "./components/team-card";
 import GenericPagination from "../../components/generic-pagination";

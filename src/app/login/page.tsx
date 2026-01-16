@@ -14,21 +14,26 @@ import {
     Loader2
 } from "lucide-react";
 
+import { Turnstile } from "@marsidev/react-turnstile";
+
 function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const searchParams = useSearchParams();
     const errorParam = searchParams.get("error");
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
+
         try {
             await signIn("credentials", {
                 email,
                 password,
+                turnstileToken,
                 redirect: true,
                 callbackUrl: "/admin",
             });
@@ -115,6 +120,8 @@ function LoginForm() {
                                         case "CredentialsSignin":
                                         case "invalid_credentials":
                                             return "Credenciais inválidas";
+                                        case "invalid_turnstile":
+                                            return "Falha na verificação de segurança (Captcha). Atualize a página e tente novamente.";
                                         case "SessionRequired":
                                             return "Acesso negado. Por favor, faça login.";
                                         default:
@@ -171,6 +178,17 @@ function LoginForm() {
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                             </div>
+                        </div>
+
+                        <div className="flex justify-center py-4">
+                            <Turnstile
+                                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                                onSuccess={(token) => setTurnstileToken(token)}
+                                options={{
+                                    theme: 'light',
+                                    action: 'login',
+                                }}
+                            />
                         </div>
 
                         <button

@@ -20,8 +20,40 @@ export const auth: NextAuthOptions = {
             credentials: {
                 email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" },
+                turnstileToken: { label: "Turnstile Token", type: "text" },
             },
             async authorize(credentials) {
+                const turnstileToken = credentials?.turnstileToken as string | undefined;
+                const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+
+                if (!turnstileSecret) {
+                    console.warn("TURNSTILE_SECRET_KEY (or TURNSTILE) is not set. Skipping verification.");
+                } else if (process.env.NODE_ENV === 'production' || turnstileSecret) {
+                    if (!turnstileToken) {
+                        throw new Error("Turnstile token missing");
+                    }
+
+                    const formData = new URLSearchParams();
+                    formData.append('secret', turnstileSecret);
+                    formData.append('response', turnstileToken);
+
+                    try {
+                        const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        const outcome = await res.json();
+                        if (!outcome.success) {
+                            console.error("Turnstile verification failed:", outcome);
+                            throw new Error("Turnstile verification failed");
+                        }
+                    } catch (error) {
+                        console.error("Turnstile error:", error);
+                        throw new Error("invalid_turnstile");
+                    }
+                }
+
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error("invalid_credentials");
                 }

@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+import { connection } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cacheTag, cacheLife } from "next/cache";
 
@@ -17,7 +18,8 @@ async function getCachedBanners() {
     });
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+    await connection();
     try {
         const banners = await getCachedBanners();
         return NextResponse.json(banners);

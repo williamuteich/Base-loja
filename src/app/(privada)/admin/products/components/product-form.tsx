@@ -70,7 +70,7 @@ export default function ProductForm({ product, brands, categories }: ProductForm
             setIsActive(product.isActive ?? true);
 
             setKeptImageUrls(product.images?.map(img => img.url) || []);
-            setSelectedCategoryIds(product.categories?.map(c => c.categoryId) || []);
+            setSelectedCategoryIds(product.categories?.map(c => c.id) || []);
 
             if (product.variants?.length) {
                 setVariants(product.variants.map(v => ({

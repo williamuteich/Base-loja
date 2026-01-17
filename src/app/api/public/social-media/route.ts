@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { connection } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cacheTag, cacheLife } from "next/cache";
 
@@ -13,7 +14,8 @@ async function getCachedSocialMedias() {
     });
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+    await connection();
     try {
         const socialMedias = await getCachedSocialMedias();
         return NextResponse.json(socialMedias);

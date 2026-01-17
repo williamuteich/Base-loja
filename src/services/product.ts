@@ -2,10 +2,14 @@
 
 import { Product, ProductsResponse } from "@/types/product";
 import { cookies } from "next/headers";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicProducts(): Promise<Product[]> {
+    "use cache";
+    cacheTag("products");
+    cacheLife("hours");
     try {
         const res = await fetch(`${API_URL}/api/public/product`);
         if (!res.ok) throw new Error("Failed to fetch public products");
@@ -17,6 +21,9 @@ export async function getPublicProducts(): Promise<Product[]> {
 }
 
 export async function getPaginatedPublicProducts(page: number = 1, limit: number = 12, category?: string, search?: string): Promise<ProductsResponse> {
+    "use cache";
+    cacheTag("products");
+    cacheLife("hours");
     try {
         const url = new URL(`${API_URL}/api/public/product`);
         url.searchParams.set("skip", ((page - 1) * limit).toString());
@@ -25,7 +32,7 @@ export async function getPaginatedPublicProducts(page: number = 1, limit: number
         if (category) url.searchParams.set("category", category);
         if (search) url.searchParams.set("search", search);
 
-        const res = await fetch(url.toString(), { next: { tags: ["products"] } });
+        const res = await fetch(url.toString());
         if (!res.ok) throw new Error("Failed to fetch paginated public products");
         return await res.json();
     } catch (error) {
@@ -35,12 +42,13 @@ export async function getPaginatedPublicProducts(page: number = 1, limit: number
 }
 
 export async function getPublicProduct(id: string): Promise<Product | null> {
+    "use cache";
+    cacheTag(`product-${id}`);
+    cacheLife("hours");
     try {
         const res = await fetch(`${API_URL}/api/public/product/${id}`, {
             method: 'GET',
-            cache: 'force-cache',
-            headers: { 'Content-Type': 'application/json' },
-            next: { tags: [`product-${id}`] }
+            headers: { 'Content-Type': 'application/json' }
         });
 
         if (!res.ok) {
@@ -56,12 +64,13 @@ export async function getPublicProduct(id: string): Promise<Product | null> {
 }
 
 export async function getRelatedProducts(id: string, limit: number = 4): Promise<Product[]> {
+    "use cache";
+    cacheTag(`product-related-${id}`);
+    cacheLife("hours");
     try {
         const res = await fetch(`${API_URL}/api/public/product/${id}/related?limit=${limit}`, {
             method: 'GET',
-            cache: 'force-cache',
-            headers: { 'Content-Type': 'application/json' },
-            next: { tags: [`product-related-${id}`] }
+            headers: { 'Content-Type': 'application/json' }
         });
 
         if (!res.ok) return [];

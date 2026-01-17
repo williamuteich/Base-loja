@@ -1,17 +1,23 @@
 "use server";
 
 import { Banner, BannersResponse } from "@/types/banner";
-
 import { cookies } from "next/headers";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicBanners(): Promise<Banner[]> {
+    "use cache";
+    cacheTag("banners");
+    cacheLife("hours");
     try {
-        const res = await fetch(`${API_URL}/api/public/banner`, { next: { tags: ["banners"] } });
+        const res = await fetch(`${API_URL}/api/public/banner`);
         if (!res.ok) throw new Error("Failed to fetch public banners");
         return await res.json();
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('NEXT_PRERENDER_INTERRUPTED') || error.digest?.includes('NEXT_PRERENDER_INTERRUPTED')) {
+            throw error;
+        }
         console.error("Error fetching public banners:", error);
         return [];
     }

@@ -74,7 +74,7 @@ export default function ProductCard({ product, backendUrl }: ProductCardProps) {
 
             <div className="p-4 md:p-6 pb-16 relative">
                 <span className="text-rose-500 text-[10px] md:text-xs font-bold tracking-widest uppercase mb-1.5 block truncate">
-                    {product.categories?.[0]?.category?.name || 'Produto'}
+                    {product.categories?.[0]?.name || 'Produto'}
                 </span>
 
                 <h3 className="font-semibold text-slate-800 text-sm md:text-lg group-hover:text-rose-600 transition-colors line-clamp-1 mb-1">

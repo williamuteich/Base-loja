@@ -2,17 +2,22 @@
 
 import { StoreConfig } from "@/types/store-config";
 import { cookies } from "next/headers";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicSettings(): Promise<StoreConfig | null> {
+    "use cache";
+    cacheTag("store-config");
+    cacheLife("hours");
     try {
-        const res = await fetch(`${API_URL}/api/public/store-configuration`, {
-            next: { tags: ["store-config"] }
-        });
+        const res = await fetch(`${API_URL}/api/public/store-configuration`);
         if (!res.ok) throw new Error("Failed to fetch public settings");
         return await res.json();
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('NEXT_PRERENDER_INTERRUPTED') || error.digest?.includes('NEXT_PRERENDER_INTERRUPTED')) {
+            throw error;
+        }
         console.error("[Service Settings] getPublicSettings Error:", error);
         return null;
     }

@@ -1,12 +1,7 @@
 import { getPublicSettings } from "@/services/settings";
-import { Metadata } from "next";
+import { Suspense } from "react";
 
-export const metadata: Metadata = {
-    title: "Contato | Joias Úteis",
-    description: "Fale com a nossa equipe. Tire suas dúvidas, faça pedidos ou combine a retirada dos seus produtos.",
-};
-
-export default async function ContatoPage() {
+async function ContactContent() {
     const config = await getPublicSettings();
 
     if (!config) {
@@ -191,5 +186,44 @@ export default async function ContatoPage() {
                 </div>
             </div>
         </section>
+    );
+}
+
+function LoadingFallback() {
+    return (
+        <section className="py-12 md:py-14 bg-white">
+            <div className="container mx-auto px-4">
+                <div className="max-w-5xl mx-auto">
+                    <div className="text-center mb-8 md:mb-10">
+                        <div className="inline-flex items-center justify-center mb-4">
+                            <div className="w-10 h-0.5 bg-pink-600 rounded-full animate-pulse"></div>
+                            <span className="mx-3 px-4 py-1.5 bg-pink-600 text-white text-[11px] font-semibold tracking-[0.18em] uppercase rounded-full">
+                                Contato
+                            </span>
+                            <div className="w-10 h-0.5 bg-pink-600 rounded-full animate-pulse"></div>
+                        </div>
+                        <div className="h-8 bg-gray-200 rounded-lg w-64 mx-auto mb-4 animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded w-96 mx-auto animate-pulse"></div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="h-96 bg-gray-100 rounded-2xl animate-pulse"></div>
+                        <div className="h-96 bg-gray-100 rounded-2xl animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+export const metadata = {
+    title: "Contato | Joias Úteis",
+    description: "Fale com a nossa equipe. Tire suas dúvidas, faça pedidos ou combine a retirada dos seus produtos.",
+};
+
+export default function ContatoPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <ContactContent />
+        </Suspense>
     );
 }

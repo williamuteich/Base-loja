@@ -1,4 +1,3 @@
-
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -7,6 +6,7 @@ import { getStoreConfig } from "@/services/store-config";
 import { ProductDetail } from "@/components/product/product-detail";
 import { RelatedProductsCarousel } from "@/components/product/related-products-carousel";
 import { ChevronRight, Home } from "lucide-react";
+import { Suspense } from "react";
 
 interface ProductPageProps {
     params: Promise<{ id: string }>;
@@ -34,9 +34,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
-    const { id } = await params;
-
+async function ProductContent({ id }: { id: string }) {
     const [product, relatedProducts, storeConfig] = await Promise.all([
         getPublicProduct(id),
         getRelatedProducts(id),
@@ -48,7 +46,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }
 
     return (
-        <main className="flex-1 bg-white">
+        <>
             <div className="container mx-auto px-4 md:px-6 py-6">
                 <div className="flex items-center gap-2 text-sm">
                     <Link href="/" className="text-gray-600 hover:text-pink-700 transition-colors flex items-center gap-1">
@@ -83,6 +81,39 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     </div>
                 </div>
             )}
+        </>
+    );
+}
+
+function ProductSkeleton() {
+    return (
+        <div className="container mx-auto px-4 md:px-6">
+            <div className="py-6">
+                <div className="h-4 bg-gray-200 w-64 rounded animate-pulse"></div>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 py-12 animate-pulse">
+                <div className="aspect-square bg-gray-200 rounded-3xl"></div>
+                <div className="space-y-6">
+                    <div className="h-8 bg-gray-200 w-3/4 rounded"></div>
+                    <div className="h-12 bg-gray-200 w-1/2 rounded"></div>
+                    <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                        <div className="h-4 bg-gray-200 w-5/6 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+    const { id } = await params;
+
+    return (
+        <main className="flex-1 bg-white">
+            <Suspense fallback={<ProductSkeleton />}>
+                <ProductContent id={id} />
+            </Suspense>
         </main>
     );
 }

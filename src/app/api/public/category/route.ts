@@ -28,11 +28,7 @@ async function getCachedCategories(skip: number, take: number, homeOnly: boolean
     if (includeProducts) {
         include.products = {
             include: {
-                product: {
-                    include: {
-                        images: true
-                    }
-                }
+                images: true
             }
         };
     }

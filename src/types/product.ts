@@ -1,3 +1,5 @@
+import { Category } from "./category";
+
 export interface Product {
     id: string;
     title: string;
@@ -8,7 +10,7 @@ export interface Product {
     createdAt: string;
     isActive: boolean;
     images: ProductImage[];
-    categories: ProductCategory[];
+    categories: Category[];
     brand?: Brand;
     brandId?: string;
     variants?: ProductVariant[];
@@ -26,14 +28,6 @@ export interface ProductImage {
     id: string;
     url: string;
     productId: string;
-}
-
-export interface ProductCategory {
-    productId: string;
-    categoryId: string;
-    category: {
-        name: string;
-    };
 }
 
 export interface Brand {

@@ -8,11 +8,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model team {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   lastName  String
   email     String   @unique
@@ -24,7 +25,7 @@ model team {
 }
 
 model client {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   lastName  String
   email     String   @unique
@@ -42,7 +43,7 @@ enum Role {
 }
 
 model Product {
-  id            String   @id @default(uuid())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   description   String?
   price         Float
@@ -53,50 +54,42 @@ model Product {
 
   variants ProductVariant[]
 
-  images     ProductImage[]
-  categories ProductCategory[]
+  images ProductImage[]
+
+  // Implicit Many-to-Many relation for MongoDB
+  categoryIDs String[]   @db.ObjectId
+  categories  Category[] @relation(fields: [categoryIDs], references: [id])
 
   brand   Brand?  @relation(fields: [brandId], references: [id])
-  brandId String?
+  brandId String? @db.ObjectId
 }
 
 model ProductVariant {
-  id       String @id @default(uuid())
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   color    String @default("#ffffff")
   name     String @default("Branco")
   quantity Int    @default(0)
 
   product   Product @relation(fields: [productId], references: [id])
-  productId String
+  productId String  @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ProductImage {
-  id  String @id @default(uuid())
+  id  String @id @default(auto()) @map("_id") @db.ObjectId
   url String
 
   product   Product @relation(fields: [productId], references: [id])
-  productId String
+  productId String  @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model ProductCategory {
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String
-
-  @@id([productId, categoryId])
-  @@index([categoryId])
-}
-
 model Category {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String   @unique
   description String?
   imageUrl    String?
@@ -105,11 +98,13 @@ model Category {
   isActive    Boolean  @default(true)
   isHome      Boolean  @default(false)
 
-  products ProductCategory[]
+  // Implicit Many-to-Many relation for MongoDB
+  productIDs String[]  @db.ObjectId
+  products   Product[] @relation(fields: [productIDs], references: [id])
 }
 
 model Brand {
-  id        String    @id @default(uuid())
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String    @unique
   products  Product[]
   createdAt DateTime  @default(now())
@@ -118,7 +113,7 @@ model Brand {
 }
 
 model banner {
-  id                String   @id @default(uuid())
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
   title             String
   subtitle          String?
   linkUrl           String?
@@ -132,7 +127,7 @@ model banner {
 }
 
 model newsletter {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   whatsapp  String?
   createdAt DateTime @default(now())
@@ -140,7 +135,7 @@ model newsletter {
 }
 
 model StoreConfiguration {
-  id String @id @default(uuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
   maintenanceMode    Boolean @default(false)
   maintenanceMessage String?
@@ -177,13 +172,13 @@ model StoreConfiguration {
 }
 
 model SocialMedia {
-  id       String  @id @default(uuid())
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   platform String  @unique
   url      String
   isActive Boolean @default(true)
 
   storeConfig   StoreConfiguration @relation(fields: [storeConfigId], references: [id])
-  storeConfigId String
+  storeConfigId String             @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

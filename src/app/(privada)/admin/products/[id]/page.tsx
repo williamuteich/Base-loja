@@ -9,7 +9,6 @@ import { connection } from "next/server";
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
     await connection();
     const { id } = await params;
-    const backendUrl = process.env.API_URL || "http://localhost:3000";
 
     const brandsData = await getAdminBrands(1, 100);
     const categoriesData = await getAdminCategories(1, 100);
@@ -19,9 +18,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         include: {
             images: true,
             variants: true,
-            categories: {
-                include: { category: true },
-            },
+            categories: true,
             brand: true,
         },
     });
@@ -50,11 +47,8 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         })),
         categories: productData.categories.map(c => ({
             ...c,
-            category: {
-                ...c.category,
-                createdAt: c.category.createdAt.toISOString(),
-                updatedAt: c.category.updatedAt.toISOString(),
-            }
+            createdAt: c.createdAt.toISOString(),
+            updatedAt: c.updatedAt.toISOString(),
         }))
     } as any;
 

@@ -84,7 +84,7 @@ export function RelatedProductsCarousel({ products, backendUrl }: RelatedProduct
                                 <div className="p-4 space-y-2">
                                     {product.categories && product.categories[0] && (
                                         <span className="text-[10px] font-semibold tracking-wider text-pink-600 uppercase bg-pink-50 px-2 py-1 rounded-full">
-                                            {product.categories[0].category.name}
+                                            {product.categories[0].name}
                                         </span>
                                     )}
                                     <h3 className="font-medium text-gray-900 line-clamp-2 min-h-[40px] group-hover:text-pink-600 transition-colors">

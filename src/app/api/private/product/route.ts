@@ -31,9 +31,7 @@ export async function GET(req: NextRequest) {
                 include: {
                     variants: true,
                     images: true,
-                    categories: {
-                        include: { category: true },
-                    },
+                    categories: true,
                     brand: true,
                 },
                 orderBy: { createdAt: 'desc' },
@@ -73,7 +71,7 @@ export async function POST(req: NextRequest) {
         const variants = variantsJson ? JSON.parse(variantsJson) : [];
 
         const categoryIdsJson = formData.get("categoryIds") as string;
-        const categoryIds = categoryIdsJson ? JSON.parse(categoryIdsJson) : [];
+        const categoryIds: string[] = categoryIdsJson ? JSON.parse(categoryIdsJson) : [];
 
         const files = formData.getAll("files") as File[];
 
@@ -122,7 +120,7 @@ export async function POST(req: NextRequest) {
                     create: uploadedImageUrls.map((url) => ({ url }))
                 },
                 categories: {
-                    create: categoryIds.map((id: string) => ({ categoryId: id }))
+                    connect: categoryIds.map((id) => ({ id }))
                 }
             },
             include: {

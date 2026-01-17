@@ -193,7 +193,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                     {product.categories?.[0] && (
                                         <>
                                             <Sparkles size={12} className="text-rose-300" />
-                                            <span className="px-4 py-1.5 bg-rose-50 rounded-full">{product.categories[0].category?.name}</span>
+                                            <span className="px-4 py-1.5 bg-rose-50 rounded-full">{product.categories[0].name}</span>
                                         </>
                                     )}
                                 </div>

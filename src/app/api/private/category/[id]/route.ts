@@ -78,6 +78,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
             }, { status: 400 });
         }
 
+        if (category.imageUrl) {
+            await UploadHandler.deleteFile(category.imageUrl);
+        }
+
         await prisma.category.delete({
             where: { id }
         });

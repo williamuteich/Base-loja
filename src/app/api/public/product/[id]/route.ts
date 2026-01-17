@@ -1,6 +1,23 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cacheTag, cacheLife } from "next/cache";
+
+async function getCachedProduct(id: string) {
+    "use cache";
+    cacheTag(`product-${id}`);
+    cacheLife("hours");
+
+    return await prisma.product.findUnique({
+        where: { id, isActive: true },
+        include: {
+            images: true,
+            variants: true,
+            categories: true,
+            brand: true
+        }
+    });
+}
 
 export async function GET(
     request: Request,
@@ -9,17 +26,7 @@ export async function GET(
     try {
         const { id } = await params;
 
-        const product = await prisma.product.findUnique({
-            where: { id, isActive: true },
-            include: {
-                images: true,
-                variants: true,
-                categories: {
-                    include: { category: true }
-                },
-                brand: true
-            }
-        });
+        const product = await getCachedProduct(id);
 
         if (!product) {
             return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
@@ -38,11 +45,11 @@ export async function GET(
             })) || [],
             categories: product.categories?.map(cat => ({
                 ...cat,
-                category: cat.category ? {
-                    ...cat.category,
-                    createdAt: cat.category.createdAt?.toISOString() || new Date().toISOString(),
-                    updatedAt: cat.category.updatedAt?.toISOString() || new Date().toISOString(),
-                } : { name: "N/A", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+                category: {
+                    ...cat,
+                    createdAt: cat.createdAt?.toISOString() || new Date().toISOString(),
+                    updatedAt: cat.updatedAt?.toISOString() || new Date().toISOString(),
+                }
             })) || [],
             brand: product.brand ? {
                 ...product.brand,

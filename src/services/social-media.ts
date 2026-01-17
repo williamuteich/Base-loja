@@ -2,15 +2,22 @@
 
 import { SocialMedia, SocialMediaResponse } from "@/types/social-media";
 import { cookies } from "next/headers";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicSocialMedias(): Promise<SocialMedia[]> {
+    "use cache";
+    cacheTag("store-config");
+    cacheLife("hours");
     try {
-        const res = await fetch(`${API_URL}/api/public/social-media`, { next: { tags: ["store-config"] } });
+        const res = await fetch(`${API_URL}/api/public/social-media`);
         if (!res.ok) throw new Error("Failed to fetch public social medias");
         return await res.json();
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('NEXT_PRERENDER_INTERRUPTED') || error.digest?.includes('NEXT_PRERENDER_INTERRUPTED')) {
+            throw error;
+        }
         console.error("[Service SocialMedia] getPublicSocialMedias Error:", error);
         return [];
     }

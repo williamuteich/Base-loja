@@ -2,35 +2,48 @@
 
 import { Category, CategoriesResponse } from "@/types/category";
 import { cookies } from "next/headers";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicCategories(homeOnly: boolean = false, includeProducts: boolean = false): Promise<Category[]> {
+    "use cache";
+    cacheTag("categories");
+    cacheLife("hours");
     try {
         const url = new URL(`${API_URL}/api/public/category`);
         url.searchParams.set("homeOnly", homeOnly ? "true" : "false");
         if (includeProducts) url.searchParams.set("includeProducts", "true");
 
-        const res = await fetch(url.toString(), { next: { tags: ["categories"] } });
+        const res = await fetch(url.toString());
         if (!res.ok) throw new Error("Failed to fetch public categories");
         return await res.json();
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('NEXT_PRERENDER_INTERRUPTED') || error.digest?.includes('NEXT_PRERENDER_INTERRUPTED')) {
+            throw error;
+        }
         console.error("[Service Category] getPublicCategories Error:", error);
         return [];
     }
 }
 
 export async function getPaginatedPublicCategories(page: number = 1, limit: number = 10): Promise<CategoriesResponse> {
+    "use cache";
+    cacheTag("categories");
+    cacheLife("hours");
     try {
         const url = new URL(`${API_URL}/api/public/category`);
         url.searchParams.set("skip", ((page - 1) * limit).toString());
         url.searchParams.set("take", limit.toString());
         url.searchParams.set("paginated", "true");
 
-        const res = await fetch(url.toString(), { next: { tags: ["categories"] } });
+        const res = await fetch(url.toString());
         if (!res.ok) throw new Error("Failed to fetch paginated public categories");
         return await res.json();
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('NEXT_PRERENDER_INTERRUPTED') || error.digest?.includes('NEXT_PRERENDER_INTERRUPTED')) {
+            throw error;
+        }
         console.error("[Service Category] getPaginatedPublicCategories Error:", error);
         return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
     }

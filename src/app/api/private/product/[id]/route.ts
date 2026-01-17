@@ -16,9 +16,7 @@ export async function GET(
             include: {
                 images: true,
                 variants: true,
-                categories: {
-                    include: { category: true },
-                },
+                categories: true,
                 brand: true,
             },
         });
@@ -53,7 +51,7 @@ export async function PATCH(
         const variants = variantsJson ? JSON.parse(variantsJson) : [];
 
         const categoryIdsJson = formData.get("categoryIds") as string;
-        const categoryIds = categoryIdsJson ? JSON.parse(categoryIdsJson) : [];
+        const categoryIds: string[] = categoryIdsJson ? JSON.parse(categoryIdsJson) : [];
 
         const keptImageUrlsJson = formData.get("keptImageUrls") as string;
         const keptImageUrls = keptImageUrlsJson ? JSON.parse(keptImageUrlsJson) : [];
@@ -95,6 +93,9 @@ export async function PATCH(
                     discountPrice,
                     isActive,
                     brandId: brandId || null,
+                    categories: {
+                        set: categoryIds.map((cid) => ({ id: cid })),
+                    },
                 }
             });
 
@@ -109,19 +110,6 @@ export async function PATCH(
                     }))
                 });
             }
-
-            await tx.productCategory.deleteMany({ where: { productId: id } });
-            if (categoryIds.length > 0) {
-                await tx.productCategory.createMany({
-                    data: categoryIds.map((catId: string) => ({
-                        productId: id,
-                        categoryId: catId
-                    }))
-                });
-            }
-
-            const currentImages = await tx.productImage.findMany({ where: { productId: id }, select: { url: true } });
-            const currentUrls = currentImages.map(img => img.url);
 
             await tx.productImage.deleteMany({
                 where: {
@@ -140,7 +128,6 @@ export async function PATCH(
                     }))
                 });
             }
-
 
             return product;
         });
@@ -165,14 +152,22 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
+        const { UploadHandler } = await import("@/lib/upload-handler");
+
+        const productImages = await prisma.productImage.findMany({
+            where: { productId: id },
+            select: { url: true }
+        });
 
         await prisma.$transaction(async (tx) => {
             await tx.productVariant.deleteMany({ where: { productId: id } });
-            await tx.productCategory.deleteMany({ where: { productId: id } });
             await tx.productImage.deleteMany({ where: { productId: id } });
-
             await tx.product.delete({ where: { id } });
         });
+
+        for (const image of productImages) {
+            await UploadHandler.deleteFile(image.url);
+        }
 
         const { revalidateTag } = await import("next/cache");
         revalidateTag("products", { expire: 10 } as any);

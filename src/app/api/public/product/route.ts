@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { connection } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cacheTag, cacheLife } from "next/cache";
 
@@ -14,9 +15,7 @@ async function getCachedProducts(skip: number, take: number, category?: string, 
     if (category) {
         where.categories = {
             some: {
-                category: {
-                    name: category
-                }
+                name: category
             }
         };
     }
@@ -33,11 +32,7 @@ async function getCachedProducts(skip: number, take: number, category?: string, 
         include: {
             images: true,
             brand: true,
-            categories: {
-                include: {
-                    category: true
-                }
-            },
+            categories: true,
             variants: true
         },
         orderBy: {
@@ -49,8 +44,9 @@ async function getCachedProducts(skip: number, take: number, category?: string, 
 }
 
 export async function GET(req: NextRequest) {
+    await connection();
     try {
-        const { searchParams } = new URL(req.url);
+        const searchParams = req.nextUrl.searchParams;
         const skip = parseInt(searchParams.get("skip") || "0");
         const take = parseInt(searchParams.get("take") || "12");
         const category = searchParams.get("category") || undefined;
@@ -64,9 +60,7 @@ export async function GET(req: NextRequest) {
             if (category) {
                 where.categories = {
                     some: {
-                        category: {
-                            name: category
-                        }
+                        name: category
                     }
                 };
             }

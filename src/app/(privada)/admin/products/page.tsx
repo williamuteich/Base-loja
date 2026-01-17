@@ -168,8 +168,8 @@ export default function ProductsPage() {
                                         <td className="p-4">
                                             <div className="flex flex-wrap gap-1">
                                                 {product.categories?.map((c) => (
-                                                    <span key={c.categoryId} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-md">
-                                                        {c.category?.name}
+                                                    <span key={c.id} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-md">
+                                                        {c.name}
                                                     </span>
                                                 ))}
                                             </div>

@@ -11,34 +11,29 @@ export const metadata: Metadata = {
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
-export default async function ProdutosPage({
-    searchParams,
+async function ProductsContent({
+    page,
+    category,
+    search,
 }: {
-    searchParams: Promise<{ page?: string; categoria?: string; search?: string }>;
+    page: number;
+    category?: string;
+    search?: string;
 }) {
-    const resolvedSearchParams = await searchParams;
-    const page = parseInt(resolvedSearchParams.page || "1");
-    const category = resolvedSearchParams.categoria;
-    const search = resolvedSearchParams.search;
     const limit = 12;
 
-    // Fetch products and categories in parallel
     const [productsData, categories] = await Promise.all([
         getPaginatedPublicProducts(page, limit, category, search),
         getPublicCategories(false, false),
     ]);
 
     return (
-        <main className="py-12 md:py-20 bg-linear-to-br from-slate-50 via-white to-pink-50/20 min-h-screen">
-            <Suspense fallback={<ProductsSkeleton />}>
-                <ProductsClient
-                    initialProducts={productsData.data}
-                    categories={categories}
-                    meta={productsData.meta}
-                    backendUrl={API_URL}
-                />
-            </Suspense>
-        </main>
+        <ProductsClient
+            initialProducts={productsData.data}
+            categories={categories}
+            meta={productsData.meta}
+            backendUrl={API_URL}
+        />
     );
 }
 
@@ -71,5 +66,24 @@ function ProductsSkeleton() {
                 ))}
             </div>
         </div>
+    );
+}
+
+export default async function ProdutosPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string; categoria?: string; search?: string }>;
+}) {
+    const resolvedSearchParams = await searchParams;
+    const page = parseInt(resolvedSearchParams.page || "1");
+    const category = resolvedSearchParams.categoria;
+    const search = resolvedSearchParams.search;
+
+    return (
+        <main className="py-12 md:py-20 bg-linear-to-br from-slate-50 via-white to-pink-50/20 min-h-screen">
+            <Suspense fallback={<ProductsSkeleton />}>
+                <ProductsContent page={page} category={category} search={search} />
+            </Suspense>
+        </main>
     );
 }

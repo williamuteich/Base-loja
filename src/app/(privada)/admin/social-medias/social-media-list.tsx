@@ -18,7 +18,6 @@ export default function SocialMediaList() {
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // Modals
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [socialToDelete, setSocialToDelete] = useState<SocialMedia | null>(null);

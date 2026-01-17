@@ -2,15 +2,22 @@
 
 import { Brand, BrandsResponse } from "@/types/brand";
 import { cookies } from "next/headers";
+import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function getPublicBrands(): Promise<Brand[]> {
+    "use cache";
+    cacheTag("brands");
+    cacheLife("hours");
     try {
-        const res = await fetch(`${API_URL}/api/public/brand`, { next: { tags: ["brands"] } });
+        const res = await fetch(`${API_URL}/api/public/brand`);
         if (!res.ok) throw new Error("Failed to fetch public brands");
         return await res.json();
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('NEXT_PRERENDER_INTERRUPTED') || error.digest?.includes('NEXT_PRERENDER_INTERRUPTED')) {
+            throw error;
+        }
         console.error("[Service Brand] getPublicBrands Error:", error);
         return [];
     }

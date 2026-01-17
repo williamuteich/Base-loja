@@ -9,7 +9,6 @@ export default async function AdminLayout({
     children: React.ReactNode
 }) {
     const session = await getServerSession(authOptions);
-    console.log(session)
     return (
         <div className="min-h-screen bg-slate-50/50 text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
             <div className="flex min-h-screen flex-col">

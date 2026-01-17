@@ -3,85 +3,86 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     ShoppingBag,
     Users,
-    TrendingUp,
     Package,
     Plus,
     ArrowRight,
     ArrowUpRight,
-    ArrowDownRight,
     Image as ImageIcon,
-    Mail,
     Tag,
     Settings,
-    Eye,
     Folder
 } from "lucide-react"
 import Link from "next/link"
-
-const stats = [
-    {
-        title: "Total de Produtos",
-        value: "48",
-        description: "Catálogo completo",
-        icon: Package,
-        trend: "neutral",
-        color: "text-blue-600",
-        bg: "bg-blue-50"
-    },
-    {
-        title: "Banners Ativos",
-        value: "3",
-        description: "Em destaque na home",
-        icon: ImageIcon,
-        trend: "up",
-        color: "text-emerald-600",
-        bg: "bg-emerald-50"
-    },
-    {
-        title: "Newsletter",
-        value: "1.2k",
-        description: "Inscritos totais",
-        icon: Mail,
-        trend: "up",
-        color: "text-amber-600",
-        bg: "bg-amber-50"
-    },
-    {
-        title: "Marcas",
-        value: "12",
-        description: "Parceiras cadastradas",
-        icon: Tag,
-        trend: "neutral",
-        color: "text-indigo-600",
-        bg: "bg-indigo-50"
-    },
-]
+import { prisma } from "@/lib/prisma"
 
 const quickActions = [
     {
         title: "Novo Produto",
         description: "Cadastre um novo item no catálogo",
-        href: "/admin/products/new",
+        href: "/admin/products/create",
         icon: Plus,
-        variant: "default"
     },
     {
         title: "Configurações",
         description: "Títulos, descrições e contatos",
         href: "/admin/settings",
         icon: Settings,
-        variant: "outline"
     },
     {
         title: "Gerenciar Equipe",
         description: "Administradores do sistema",
         href: "/admin/team",
         icon: Users,
-        variant: "outline"
     }
 ]
 
-export default function AdminPage() {
+export default async function AdminPage() {
+    const [productsCount, bannersCount, brandsCount, categoriesCount] = await Promise.all([
+        prisma.product.count(),
+        prisma.banner.count({ where: { isActive: true } }),
+        prisma.brand.count({ where: { isActive: true } }),
+        prisma.category.count({ where: { isActive: true } }),
+    ]);
+
+    const stats = [
+        {
+            title: "Total de Produtos",
+            value: productsCount.toString(),
+            description: "Catálogo completo",
+            icon: Package,
+            trend: "neutral",
+            color: "text-blue-600",
+            bg: "bg-blue-50"
+        },
+        {
+            title: "Banners Ativos",
+            value: bannersCount.toString(),
+            description: "Em destaque na home",
+            icon: ImageIcon,
+            trend: bannersCount > 0 ? "up" : "neutral",
+            color: "text-emerald-600",
+            bg: "bg-emerald-50"
+        },
+        {
+            title: "Categorias",
+            value: categoriesCount.toString(),
+            description: "Coleções organizadas",
+            icon: Folder,
+            trend: "neutral",
+            color: "text-purple-600",
+            bg: "bg-purple-50"
+        },
+        {
+            title: "Marcas",
+            value: brandsCount.toString(),
+            description: "Parceiras cadastradas",
+            icon: Tag,
+            trend: "neutral",
+            color: "text-indigo-600",
+            bg: "bg-indigo-50"
+        },
+    ];
+
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
             <div className="relative overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-blue-900 rounded-3xl p-8 md:p-12 shadow-2xl shadow-blue-900/10">
@@ -128,9 +129,8 @@ export default function AdminPage() {
                                     </div>
                                     <div className="flex items-center">
                                         {stat.trend === "up" && <ArrowUpRight className="w-4 h-4 text-emerald-500" />}
-                                        {stat.trend === "down" && <ArrowDownRight className="w-4 h-4 text-rose-500" />}
-                                        <span className={`text-xs font-bold ml-0.5 ${stat.trend === "up" ? "text-emerald-500" : stat.trend === "down" ? "text-rose-500" : "text-slate-400"}`}>
-                                            {stat.trend === "neutral" ? "Estável" : stat.trend === "up" ? "↑" : "↓"}
+                                        <span className={`text-xs font-bold ml-0.5 ${stat.trend === "up" ? "text-emerald-500" : "text-slate-400"}`}>
+                                            {stat.trend === "neutral" ? "Estável" : "↑"}
                                         </span>
                                     </div>
                                 </div>
@@ -157,15 +157,19 @@ export default function AdminPage() {
                         <CardContent className="p-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-4">
-                                    <h4 className="text-sm font-bold text-slate-700">Destaques Ativos</h4>
+                                    <h4 className="text-sm font-bold text-slate-700">Resumo</h4>
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                            <span className="text-sm text-slate-600 font-medium text-ellipsis overflow-hidden whitespace-nowrap">Banner Coleção de Verão</span>
-                                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full">ATIVO</span>
+                                            <span className="text-sm text-slate-600 font-medium">Produtos Cadastrados</span>
+                                            <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">{productsCount}</span>
                                         </div>
                                         <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                            <span className="text-sm text-slate-600 font-medium text-ellipsis overflow-hidden whitespace-nowrap">Promoção Dia das Mães</span>
-                                            <span className="px-2 py-0.5 bg-slate-200 text-slate-500 text-[10px] font-bold rounded-full">AGENDADO</span>
+                                            <span className="text-sm text-slate-600 font-medium">Banners Ativos</span>
+                                            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">{bannersCount}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <span className="text-sm text-slate-600 font-medium">Categorias Ativas</span>
+                                            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">{categoriesCount}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -174,7 +178,14 @@ export default function AdminPage() {
                                     <p className="text-xs text-slate-400 leading-relaxed">
                                         Mantenha seu catálogo atualizado para garantir que seus clientes vejam sempre as últimas novidades.
                                     </p>
-                                    <Button variant="outline" className="w-full text-blue-600 border-blue-200 hover:bg-blue-50">Configurar Vitrine</Button>
+                                    <div className="space-y-2">
+                                        <Button asChild variant="outline" className="w-full text-blue-600 border-blue-200 hover:bg-blue-50">
+                                            <Link href="/admin/banners">Gerenciar Banners</Link>
+                                        </Button>
+                                        <Button asChild variant="outline" className="w-full text-purple-600 border-purple-200 hover:bg-purple-50">
+                                            <Link href="/admin/categories">Gerenciar Categorias</Link>
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>

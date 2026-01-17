@@ -41,12 +41,12 @@ export async function getPaginatedPublicProducts(page: number = 1, limit: number
     }
 }
 
-export async function getPublicProduct(id: string): Promise<Product | null> {
+export async function getPublicProduct(slug: string): Promise<Product | null> {
     "use cache";
-    cacheTag(`product-${id}`);
+    cacheTag(`product-${slug}`);
     cacheLife("hours");
     try {
-        const res = await fetch(`${API_URL}/api/public/product/${id}`, {
+        const res = await fetch(`${API_URL}/api/public/product/${slug}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -63,12 +63,12 @@ export async function getPublicProduct(id: string): Promise<Product | null> {
     }
 }
 
-export async function getRelatedProducts(id: string, limit: number = 4): Promise<Product[]> {
+export async function getRelatedProducts(slug: string, limit: number = 4): Promise<Product[]> {
     "use cache";
-    cacheTag(`product-related-${id}`);
+    cacheTag(`product-related-${slug}`);
     cacheLife("hours");
     try {
-        const res = await fetch(`${API_URL}/api/public/product/${id}/related?limit=${limit}`, {
+        const res = await fetch(`${API_URL}/api/public/product/${slug}/related?limit=${limit}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });

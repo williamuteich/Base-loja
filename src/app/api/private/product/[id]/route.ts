@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 import { connection } from "next/server";
 
 export async function GET(
@@ -84,18 +85,59 @@ export async function PATCH(
         }
 
         const updatedProduct = await prisma.$transaction(async (tx) => {
+            const currentProduct = await tx.product.findUnique({
+                where: { id },
+                select: { title: true, slug: true }
+            });
+
+            let slug = currentProduct?.slug;
+            if (title && title !== currentProduct?.title) {
+                const baseSlug = title
+                    .toLowerCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^\w\s-]/g, "")
+                    .replace(/\s+/g, "-")
+                    .trim();
+
+                let uniqueSlug = baseSlug;
+                let counter = 1;
+                while (await tx.product.findFirst({ where: { slug: uniqueSlug, NOT: { id } } })) {
+                    uniqueSlug = `${baseSlug}-${counter}`;
+                    counter++;
+                }
+                slug = uniqueSlug;
+            }
+
+            const specsRaw = formData.get("specs") as string | null;
+            let specs: Record<string, string> = {};
+            if (specsRaw) {
+                specsRaw.split(',').forEach(item => {
+                    const [key, value] = item.split(':').map(s => s.trim());
+                    if (key && value) specs[key] = value;
+                });
+            }
+
             const product = await tx.product.update({
                 where: { id },
                 data: {
                     title,
+                    slug,
                     description,
                     price,
                     discountPrice,
                     isActive,
+                    specs: specs as any,
                     brandId: brandId || null,
                     categories: {
                         set: categoryIds.map((cid) => ({ id: cid })),
                     },
+                },
+                include: {
+                    images: true,
+                    variants: true,
+                    categories: true,
+                    brand: true,
                 }
             });
 
@@ -132,8 +174,10 @@ export async function PATCH(
             return product;
         });
 
-        const { revalidateTag } = await import("next/cache");
-        revalidateTag("products", { expire: 10 } as any);
+        revalidateTag("products", { expire: 0 } as any);
+        if (updatedProduct.slug) {
+            revalidateTag(`product-${updatedProduct.slug}`, { expire: 0 } as any);
+        }
 
         return NextResponse.json(updatedProduct);
 
@@ -156,8 +200,10 @@ export async function DELETE(
 
         const productImages = await prisma.productImage.findMany({
             where: { productId: id },
-            select: { url: true }
+            select: { url: true, product: { select: { slug: true } } }
         });
+
+        const slug = productImages[0]?.product?.slug;
 
         await prisma.$transaction(async (tx) => {
             await tx.productVariant.deleteMany({ where: { productId: id } });
@@ -169,8 +215,10 @@ export async function DELETE(
             await UploadHandler.deleteFile(image.url);
         }
 
-        const { revalidateTag } = await import("next/cache");
-        revalidateTag("products", { expire: 10 } as any);
+        revalidateTag("products", { expire: 0 } as any);
+        if (slug) {
+            revalidateTag(`product-${slug}`, { expire: 0 } as any);
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

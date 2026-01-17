@@ -168,7 +168,7 @@ export default function ProductsClient({
                         {initialProducts.map((product, i) => (
                             <Link
                                 key={product.id}
-                                href={`/produto/${product.id}`}
+                                href={`/produto/${product.slug}`}
                                 className={cn(
                                     "group bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-slate-100 transition-all duration-500 hover:border-pink-200 hover:shadow-2xl hover:shadow-pink-100/50 flex animate-fade-in",
                                     viewMode === "grid" ? "flex-col" : "flex-row md:items-center"

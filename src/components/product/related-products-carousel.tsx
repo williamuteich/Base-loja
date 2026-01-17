@@ -53,7 +53,7 @@ export function RelatedProductsCarousel({ products, backendUrl }: RelatedProduct
                     {products.map((product) => (
                         <div key={product.id} className="flex-[0_0_100%] min-w-0 md:flex-[0_0_50%] lg:flex-[0_0_33.333%] xl:flex-[0_0_25%] pl-4">
                             <Link
-                                href={`/produto/${product.id}`}
+                                href={`/produto/${product.slug}`}
                                 className="group block bg-white rounded-xl border border-pink-100 hover:border-pink-300 shadow-sm hover:shadow-md transition-all h-full"
                             >
                                 <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gray-100">

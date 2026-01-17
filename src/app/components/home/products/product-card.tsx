@@ -26,7 +26,7 @@ export default function ProductCard({ product, backendUrl }: ProductCardProps) {
 
     return (
         <Link
-            href={`/produto/${product.id}`}
+            href={`/produto/${product.slug}`}
             className="group block bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-slate-200 transition-all duration-500 h-full"
         >
             <div className="relative aspect-square overflow-hidden bg-slate-50">

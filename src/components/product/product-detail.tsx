@@ -32,8 +32,11 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
     const variants = useMemo(() => product.variants || [], [product.variants]);
 
     const specs = useMemo(() => {
-        if (!product.specs) return [];
-        return Object.entries(product.specs).map(([key, value]) => ({ key, value }));
+        if (!product.specs || typeof product.specs !== 'object' || Array.isArray(product.specs)) return [];
+        return Object.entries(product.specs).map(([key, value]) => ({
+            key,
+            value: String(value)
+        }));
     }, [product.specs]);
 
     const totalQuantity = useMemo(() => {
@@ -78,7 +81,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
         }
         parts.push(`📦 Quantidade: ${quantity}`);
 
-        const urlProduct = `${backendUrl}/produto/${product.id}`;
+        const urlProduct = `${backendUrl}/produto/${product.slug}`;
         parts.push(`🔗 Link: ${urlProduct}`);
 
         const message = encodeURIComponent(parts.join('\n'));
@@ -109,7 +112,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                             alt={product.title}
                             fill
                             priority
-                            className="object-contain p-6"
+                            className="object-cover"
                             unoptimized
                         />
                     ) : (
@@ -117,16 +120,6 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                             <Sparkles size={72} strokeWidth={1} />
                         </div>
                     )}
-
-                    <button
-                        onClick={() => setIsFavorite(!isFavorite)}
-                        className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-full shadow-lg border border-rose-100 hover:shadow-rose-200/50 transition-all hover:scale-105"
-                    >
-                        <Heart
-                            size={20}
-                            className={isFavorite ? "fill-rose-500 text-rose-500" : "text-rose-300"}
-                        />
-                    </button>
 
                     {product.discountPrice && product.discountPrice < product.price && (
                         <div className="absolute top-6 left-6 flex flex-col items-center justify-center w-14 h-14 bg-rose-600 text-white rounded-full shadow-xl border-2 border-white z-20">
@@ -210,7 +203,6 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                     <Share2 size={20} className="text-rose-500" />
                                 </button>
                             </div>
-
 
                             <div className="flex items-center gap-6 pt-2">
                                 <div className="flex items-baseline gap-3">
@@ -352,7 +344,6 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                 <span>Solicitar via WhatsApp</span>
                             </button>
                         </div>
-
                     </div>
 
                     <div className="grid grid-cols-3 gap-4 pt-4">

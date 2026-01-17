@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cacheTag, cacheLife } from "next/cache";
 
-async function getCachedProduct(id: string) {
+async function getCachedProduct(slug: string) {
     "use cache";
-    cacheTag(`product-${id}`);
+    cacheTag(`product-${slug}`);
     cacheLife("hours");
 
     return await prisma.product.findUnique({
-        where: { id, isActive: true },
+        where: { slug, isActive: true },
         include: {
             images: true,
             variants: true,
@@ -21,12 +21,12 @@ async function getCachedProduct(id: string) {
 
 export async function GET(
     request: Request,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
-        const { id } = await params;
+        const { slug } = await params;
 
-        const product = await getCachedProduct(id);
+        const product = await getCachedProduct(slug);
 
         if (!product) {
             return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
@@ -34,6 +34,7 @@ export async function GET(
 
         return NextResponse.json({
             ...product,
+            specs: product.specs,
             createdAt: product.createdAt?.toISOString() || new Date().toISOString(),
             images: product.images?.map(img => ({
                 ...img,

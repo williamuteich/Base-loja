@@ -3,14 +3,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cacheTag, cacheLife } from "next/cache";
 
-async function getCachedRelatedProducts(id: string, limit: number) {
+async function getCachedRelatedProducts(slug: string, limit: number) {
     "use cache";
-    cacheTag(`product-related-${id}`);
+    cacheTag(`product-related-${slug}`);
     cacheLife("hours");
 
     const product = await prisma.product.findUnique({
-        where: { id },
-        select: { categories: { select: { id: true } } },
+        where: { slug },
+        select: { id: true, categories: { select: { id: true } } },
     });
 
     if (!product) {
@@ -27,7 +27,7 @@ async function getCachedRelatedProducts(id: string, limit: number) {
         where: {
             isActive: true,
             AND: [
-                { id: { not: id } },
+                { id: { not: product.id } },
                 {
                     categories: {
                         some: {
@@ -50,14 +50,14 @@ async function getCachedRelatedProducts(id: string, limit: number) {
 
 export async function GET(
     request: Request,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
-        const { id } = await params;
+        const { slug } = await params;
         const url = new URL(request.url);
         const limit = parseInt(url.searchParams.get("limit") || "4");
 
-        const related = await getCachedRelatedProducts(id, limit);
+        const related = await getCachedRelatedProducts(slug, limit);
 
         const formatted = related.map(p => ({
             ...p,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
+import { revalidateTag } from "next/cache";
 import { connection } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -56,6 +56,17 @@ export async function GET(req: NextRequest) {
     }
 }
 
+
+function generateSlug(title: string): string {
+    return title
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .trim();
+}
+
 export async function POST(req: NextRequest) {
     try {
         const formData = await req.formData();
@@ -89,6 +100,25 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        let slug = generateSlug(title);
+        let uniqueSlug = slug;
+        let counter = 1;
+
+        while (await prisma.product.findUnique({ where: { slug: uniqueSlug } })) {
+            uniqueSlug = `${slug}-${counter}`;
+            counter++;
+        }
+        slug = uniqueSlug;
+
+        const specsRaw = formData.get("specs") as string | null;
+        let specs: Record<string, string> = {};
+        if (specsRaw) {
+            specsRaw.split(',').forEach(item => {
+                const [key, value] = item.split(':').map(s => s.trim());
+                if (key && value) specs[key] = value;
+            });
+        }
+
         const uploadedImageUrls = [];
         if (files && files.length > 0) {
             const { UploadHandler } = await import("@/lib/upload-handler");
@@ -104,10 +134,12 @@ export async function POST(req: NextRequest) {
         const product = await prisma.product.create({
             data: {
                 title,
+                slug,
                 description,
                 price,
                 discountPrice,
                 isActive,
+                specs: specs as any,
                 brandId: brandId || null,
                 variants: {
                     create: variants.map((v: any) => ({
@@ -131,8 +163,10 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const { revalidateTag } = await import("next/cache");
-        revalidateTag("products", { expire: 10 } as any);
+        revalidateTag("products", { expire: 0 } as any);
+        if (product.slug) {
+            revalidateTag(`product-${product.slug}`, { expire: 0 } as any);
+        }
 
         return NextResponse.json(product, { status: 201 });
 

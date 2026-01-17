@@ -9,12 +9,12 @@ import { ChevronRight, Home } from "lucide-react";
 import { Suspense } from "react";
 
 interface ProductPageProps {
-    params: Promise<{ id: string }>;
+    params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-    const { id } = await params;
-    const product = await getPublicProduct(id);
+    const { slug } = await params;
+    const product = await getPublicProduct(slug);
 
     if (!product) {
         return {
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     }
 
     return {
-        title: `${product.title} | Loja Oficial`,
+        title: `${product.title} | Joias Úteis`,
         description: product.description || `Confira ${product.title} na nossa loja!`,
         openGraph: {
             title: product.title,
@@ -34,16 +34,17 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     };
 }
 
-async function ProductContent({ id }: { id: string }) {
-    const [product, relatedProducts, storeConfig] = await Promise.all([
-        getPublicProduct(id),
-        getRelatedProducts(id),
+async function ProductContent({ slug }: { slug: string }) {
+    const [product, storeConfig] = await Promise.all([
+        getPublicProduct(slug),
         getStoreConfig()
     ]);
 
     if (!product) {
         return notFound();
     }
+
+    const relatedProducts = await getRelatedProducts(slug);
 
     return (
         <>
@@ -107,12 +108,12 @@ function ProductSkeleton() {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-    const { id } = await params;
+    const { slug } = await params;
 
     return (
         <main className="flex-1 bg-white">
             <Suspense fallback={<ProductSkeleton />}>
-                <ProductContent id={id} />
+                <ProductContent slug={slug} />
             </Suspense>
         </main>
     );

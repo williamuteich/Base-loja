@@ -51,12 +51,12 @@ model Product {
   specs         Json?
   createdAt     DateTime @default(now())
   isActive      Boolean  @default(true)
+  slug          String   @unique @map("slug")
 
   variants ProductVariant[]
 
   images ProductImage[]
 
-  // Implicit Many-to-Many relation for MongoDB
   categoryIDs String[]   @db.ObjectId
   categories  Category[] @relation(fields: [categoryIDs], references: [id])
 

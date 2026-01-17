@@ -187,7 +187,7 @@ export default function ProductsPage() {
                                         </td>
                                         <td className="p-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Link href={`/produto/${product.id}`} target="_blank" className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer" title="Visualizar na loja">
+                                                <Link href={`/produto/${product.slug}`} target="_blank" className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer" title="Visualizar na loja">
                                                     <Eye className="w-4 h-4" />
                                                 </Link>
                                                 <Link href={`/admin/products/${product.id}`} className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer" title="Editar">

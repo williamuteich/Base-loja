@@ -72,6 +72,15 @@ export default function ProductForm({ product, brands, categories }: ProductForm
             setKeptImageUrls(product.images?.map(img => img.url) || []);
             setSelectedCategoryIds(product.categories?.map(c => c.id) || []);
 
+            if (product.specs) {
+                const specsStr = Object.entries(product.specs as Record<string, any>)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join(', ');
+                setSpecs(specsStr);
+            } else {
+                setSpecs("");
+            }
+
             if (product.variants?.length) {
                 setVariants(product.variants.map(v => ({
                     name: v.name,

@@ -5,8 +5,8 @@ export default function PrivacidadePage() {
     return (
         <>
             <Header />
-            <main className="pt-[116px]">
-                <section className="py-12 md:py-16 bg-white">
+            <main>
+                <section className="pt-4 pb-10 bg-white">
                     <div className="container mx-auto px-4">
                         <div className="max-w-3xl mx-auto">
                             <header className="mb-8 md:mb-10 text-center md:text-left">

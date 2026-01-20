@@ -18,6 +18,7 @@ import {
     Home,
     ShoppingBag,
     ShieldCheck,
+    Percent,
     Globe
 } from "lucide-react"
 
@@ -31,6 +32,7 @@ export default function Sidebar() {
     const menuItems = [
         { icon: LayoutGrid, label: "Início", href: "/admin" },
         { icon: ShoppingBag, label: "Produtos", href: "/admin/products" },
+        { icon: Percent, label: "Ofertas", href: "/admin/offers" },
         { icon: Folder, label: "Categorias", href: "/admin/categories" },
         { icon: Tag, label: "Marcas", href: "/admin/brands" },
         { icon: ShieldCheck, label: "Equipe", href: "/admin/team" },

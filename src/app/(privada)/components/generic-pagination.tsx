@@ -7,7 +7,10 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
+    PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { useState, useRef, useEffect } from "react";
+import { ChevronRight } from "lucide-react";
 
 interface GenericPaginationProps {
     page: number;
@@ -16,6 +19,12 @@ interface GenericPaginationProps {
 }
 
 export default function GenericPagination({ page, totalPages, onPageChange }: GenericPaginationProps) {
+    const [jumpPage, setJumpPage] = useState("");
+
+    useEffect(() => {
+        setJumpPage("");
+    }, [page]);
+
     if (totalPages <= 1) return null;
 
     const handlePrevious = (e: React.MouseEvent) => {
@@ -33,9 +42,47 @@ export default function GenericPagination({ page, totalPages, onPageChange }: Ge
         onPageChange(p);
     };
 
+    const handleJumpSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const pageNum = parseInt(jumpPage);
+        if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+            onPageChange(pageNum);
+            setJumpPage("");
+        }
+    };
+
+    const getVisiblePages = () => {
+        const delta = 2;
+        const range = [];
+        const rangeWithDots = [];
+        let l;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= page - delta && i <= page + delta)) {
+                range.push(i);
+            }
+        }
+
+        for (let i of range) {
+            if (l) {
+                if (i - l === 2) {
+                    rangeWithDots.push(l + 1);
+                } else if (i - l !== 1) {
+                    rangeWithDots.push('...');
+                }
+            }
+            rangeWithDots.push(i);
+            l = i;
+        }
+
+        return rangeWithDots;
+    };
+
+    const visiblePages = getVisiblePages();
+
     return (
-        <div className="mt-8">
-            <Pagination>
+        <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
+            <Pagination className="justify-center sm:justify-start">
                 <PaginationContent>
                     <PaginationItem>
                         <PaginationPrevious
@@ -45,21 +92,22 @@ export default function GenericPagination({ page, totalPages, onPageChange }: Ge
                         />
                     </PaginationItem>
 
-                    {[...Array(totalPages)].map((_, i) => {
-                        const p = i + 1;
-                        return (
-                            <PaginationItem key={p}>
+                    {visiblePages.map((p, i) => (
+                        <PaginationItem key={i}>
+                            {p === '...' ? (
+                                <PaginationEllipsis />
+                            ) : (
                                 <PaginationLink
                                     href="#"
-                                    onClick={(e) => handlePageClick(e, p)}
+                                    onClick={(e) => handlePageClick(e, p as number)}
                                     isActive={page === p}
                                     className="cursor-pointer"
                                 >
                                     {p}
                                 </PaginationLink>
-                            </PaginationItem>
-                        );
-                    })}
+                            )}
+                        </PaginationItem>
+                    ))}
 
                     <PaginationItem>
                         <PaginationNext
@@ -70,6 +118,33 @@ export default function GenericPagination({ page, totalPages, onPageChange }: Ge
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>
+
+            <div className="flex items-center gap-2 text-sm text-slate-500">
+                <span className="whitespace-nowrap">Ir para:</span>
+                <input
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    value={jumpPage}
+                    onChange={(e) => setJumpPage(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleJumpSubmit(e);
+                        }
+                    }}
+                    className="w-16 h-9 px-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900/10 text-center"
+                    placeholder="Pg"
+                />
+                <button
+                    type="button"
+                    onClick={handleJumpSubmit}
+                    disabled={!jumpPage || parseInt(jumpPage) < 1 || parseInt(jumpPage) > totalPages}
+                    className="w-9 h-9 flex items-center justify-center bg-slate-900 text-white rounded-md hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                    <ChevronRight className="w-4 h-4" />
+                </button>
+            </div>
         </div>
     );
 }

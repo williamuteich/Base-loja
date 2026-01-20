@@ -43,15 +43,16 @@ enum Role {
 }
 
 model Product {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   description   String?
   price         Float
   discountPrice Float?
   specs         Json?
-  createdAt     DateTime @default(now())
-  isActive      Boolean  @default(true)
-  slug          String   @unique @map("slug")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime? @updatedAt
+  isActive      Boolean   @default(true)
+  slug          String    @unique @map("slug")
 
   variants ProductVariant[]
 

@@ -30,6 +30,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     const product = {
         ...productData,
         createdAt: productData.createdAt.toISOString(),
+        updatedAt: productData.updatedAt.toISOString(),
         brand: productData.brand ? {
             ...productData.brand,
             createdAt: productData.brand.createdAt.toISOString(),

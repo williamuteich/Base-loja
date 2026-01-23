@@ -41,6 +41,17 @@ export default function ProductsClient({
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const currentCategory = searchParams.get("categoria");
     const currentPage = parseInt(searchParams.get("page") || "1");
+    const [jumpPage, setJumpPage] = useState("");
+
+    const handleJumpSubmit = () => {
+        const pageNum = parseInt(jumpPage);
+        if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= meta.totalPages) {
+            const params = new URLSearchParams(searchParams.toString());
+            params.set("page", pageNum.toString());
+            router.push(`/produtos?${params.toString()}`);
+            setJumpPage("");
+        }
+    };
 
     const onCategorySelect = (categoryName: string | null) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -273,7 +284,7 @@ export default function ProductsClient({
 
                     {meta.totalPages > 1 && (
                         <div className="mt-20 flex justify-center">
-                            <div className="bg-white/50 backdrop-blur-md p-2 rounded-2xl border border-slate-100 shadow-sm">
+                            <div className="bg-white/50 backdrop-blur-md p-2 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-4">
                                 <Pagination>
                                     <PaginationContent>
                                         <PaginationItem>
@@ -341,6 +352,33 @@ export default function ProductsClient({
                                         </PaginationItem>
                                     </PaginationContent>
                                 </Pagination>
+
+                                {/* Jump Input */}
+                                <div className="flex items-center gap-2 text-sm text-slate-500 pr-2 border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-4 w-full md:w-auto justify-center">
+                                    <span className="whitespace-nowrap">Ir para:</span>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={meta.totalPages}
+                                        value={jumpPage}
+                                        onChange={(e) => setJumpPage(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                handleJumpSubmit();
+                                            }
+                                        }}
+                                        className="w-16 h-9 px-2 bg-white/50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 text-center transition-all"
+                                        placeholder="Pg"
+                                    />
+                                    <button
+                                        onClick={handleJumpSubmit}
+                                        disabled={!jumpPage || parseInt(jumpPage) < 1 || parseInt(jumpPage) > meta.totalPages}
+                                        className="w-9 h-9 flex items-center justify-center bg-slate-900 text-white rounded-lg hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                                    >
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}

@@ -191,11 +191,13 @@ export default function CategoryList() {
                         ))}
                     </div>
 
-                    <GenericPagination
-                        page={page}
-                        totalPages={totalPages}
-                        onPageChange={setPage}
-                    />
+                    <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-center rounded-2xl">
+                        <GenericPagination
+                            page={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
+                    </div>
                 </div>
             )}
 

@@ -10,10 +10,16 @@ export async function GET(req: NextRequest) {
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "10");
         const search = searchParams.get("search") || "";
-
+        const hasDiscount = searchParams.get("hasDiscount");
         const skip = (page - 1) * limit;
 
         const where: any = {};
+
+        if (hasDiscount === "true") {
+            where.discountPrice = { not: null };
+        } else if (hasDiscount === "false") {
+            where.discountPrice = null;
+        }
 
         if (search) {
             where.OR = [

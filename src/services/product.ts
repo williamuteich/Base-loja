@@ -81,13 +81,14 @@ export async function getRelatedProducts(slug: string, limit: number = 4): Promi
     }
 }
 
-export async function getAdminProducts(page: number = 1, limit: number = 10, search: string = ""): Promise<ProductsResponse> {
+export async function getAdminProducts(page: number = 1, limit: number = 10, search: string = "", hasDiscount?: boolean): Promise<ProductsResponse> {
     try {
         const cookieStore = await cookies();
         const url = new URL(`${API_URL}/api/private/product`);
         url.searchParams.set("page", page.toString());
         url.searchParams.set("limit", limit.toString());
         if (search) url.searchParams.set("search", search);
+        if (hasDiscount !== undefined) url.searchParams.set("hasDiscount", hasDiscount.toString());
 
         const res = await fetch(url.toString(), {
             cache: "no-store",

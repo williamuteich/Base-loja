@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
-import { Search, Calendar, Tag, DollarSign, Save, Percent, Check, AlertCircle, Loader2, Package } from "lucide-react";
+import { Search, Calendar, Tag, DollarSign, Save, Percent, Check, AlertCircle, Loader2, Package, X } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { getAdminProducts } from "@/services/product";
+import { getAdminProducts, updateProduct } from "@/services/product";
 import { useDebounce } from "@/hooks/use-debounce";
 import GenericPagination from "@/app/(privada)/components/generic-pagination";
 
@@ -17,31 +17,22 @@ export default function OffersForm() {
     const [searchResults, setSearchResults] = useState<Product[]>([]);
     const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
-    // Pagination state
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const itemsPerPage = 5;
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [viewMode, setViewMode] = useState<"offers" | "new">("offers");
 
-    // Form states
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
     const [currentPrice, setCurrentPrice] = useState("");
     const [discountPrice, setDiscountPrice] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Search effect
     useEffect(() => {
         const fetchProducts = async () => {
             setIsLoadingProducts(true);
             try {
-                // If search changed, reset to page 1 (handled by dependency on debouncedSearch, 
-                // but we need to ensure page 1 is used if it was a search change, not a page change. 
-                // Ideally separation of concerns, but for now we fetch based on current page state.
-                // NOTE: When searchTerm changes, we should ideally setPage(1). 
-
-                const response = await getAdminProducts(page, itemsPerPage, debouncedSearch);
+                const response = await getAdminProducts(page, itemsPerPage, debouncedSearch, viewMode === "offers" ? true : undefined);
                 setSearchResults(response.data);
                 setTotalPages(response.meta.totalPages);
             } catch (error) {
@@ -54,29 +45,11 @@ export default function OffersForm() {
         };
 
         fetchProducts();
-    }, [debouncedSearch, page]);
+    }, [debouncedSearch, page, viewMode]);
 
-    // Reset page when search term changes
     useEffect(() => {
         setPage(1);
-    }, [debouncedSearch]);
-
-
-    // Initialize dates
-    useEffect(() => {
-        const now = new Date();
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        // Format to YYYY-MM-DDTHH:mm for datetime-local input
-        const formatDate = (date: Date) => {
-            const pad = (n: number) => n < 10 ? '0' + n : n;
-            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-        };
-
-        setStartDate(formatDate(now));
-        setEndDate(formatDate(tomorrow));
-    }, []);
+    }, [debouncedSearch, viewMode]);
 
     const formatCurrency = (value: string | number) => {
         if (!value) return "";
@@ -118,6 +91,27 @@ export default function OffersForm() {
         }
     };
 
+    const handleRemoveDiscount = async (product: Product) => {
+        try {
+            const formData = new FormData();
+            formData.append("discountPrice", "");
+
+            const result = await updateProduct(product.id, formData);
+            if (result) {
+                toast.success(`Oferta removida de "${product.title}"`);
+                const response = await getAdminProducts(page, itemsPerPage, debouncedSearch, viewMode === "offers" ? true : undefined);
+                setSearchResults(response.data);
+                if (selectedProduct?.id === product.id) {
+                    setSelectedProduct(null);
+                    setDiscountPrice("");
+                    setCurrentPrice("");
+                }
+            }
+        } catch (error) {
+            toast.error("Erro ao remover oferta.");
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -131,23 +125,35 @@ export default function OffersForm() {
             return;
         }
 
+        const priceNum = parseFloat(parseCurrency(currentPrice));
+        const discountPriceNum = parseFloat(parseCurrency(discountPrice));
+
+        if (discountPriceNum >= priceNum) {
+            toast.error("O preço promocional deve ser menor que o preço de venda.");
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
-            // Simulation of API call
-            console.log({
-                productId: selectedProduct.id,
-                startDate,
-                endDate,
-                price: parseCurrency(currentPrice),
-                discountPrice: parseCurrency(discountPrice)
-            });
+            const formData = new FormData();
+            formData.append("price", parseCurrency(currentPrice));
+            formData.append("discountPrice", parseCurrency(discountPrice));
 
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            toast.success("Promoção criada com sucesso!");
+            const result = await updateProduct(selectedProduct.id, formData);
 
-        } catch (error) {
-            toast.error("Erro ao criar promoção.");
+            if (result) {
+                toast.success("Promoção aplicada com sucesso!");
+                const response = await getAdminProducts(page, itemsPerPage, debouncedSearch, viewMode === "offers" ? true : undefined);
+                setSearchResults(response.data);
+                setSelectedProduct(null);
+                setDiscountPrice("");
+                if (viewMode === "new") {
+                    setViewMode("offers");
+                }
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Erro ao aplicar promoção.");
         } finally {
             setIsSubmitting(false);
         }
@@ -156,7 +162,6 @@ export default function OffersForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Product Selection */}
                 <div className="lg:col-span-2 space-y-6">
                     <section className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
                         <div className="flex items-center gap-3">
@@ -164,12 +169,34 @@ export default function OffersForm() {
                                 <Tag className="w-5 h-5" />
                             </div>
                             <div>
-                                <h2 className="text-lg font-bold text-slate-900">Escolha o Produto</h2>
-                                <p className="text-sm text-slate-400 font-medium">Busque pelo nome do produto para aplicar a oferta</p>
+                                <h2 className="text-lg font-bold text-slate-900">Gerenciar Ofertas</h2>
+                                <p className="text-sm text-slate-400 font-medium">Aplique ou remova descontos dos produtos</p>
                             </div>
                         </div>
 
-                        {/* Search Bar */}
+                        <div className="flex p-1 bg-slate-100 rounded-2xl w-full sm:w-fit">
+                            <button
+                                type="button"
+                                onClick={() => setViewMode("offers")}
+                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${viewMode === "offers"
+                                    ? "bg-white text-blue-600 shadow-sm"
+                                    : "text-slate-500 hover:text-slate-700"
+                                    }`}
+                            >
+                                Em Oferta
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setViewMode("new")}
+                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${viewMode === "new"
+                                    ? "bg-white text-blue-600 shadow-sm"
+                                    : "text-slate-500 hover:text-slate-700"
+                                    }`}
+                            >
+                                Adicionar
+                            </button>
+                        </div>
+
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                             <input
@@ -186,7 +213,6 @@ export default function OffersForm() {
                             )}
                         </div>
 
-                        {/* Product Table */}
                         <div className="border border-slate-200 rounded-2xl overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
@@ -195,19 +221,20 @@ export default function OffersForm() {
                                             <th className="p-4 font-semibold text-slate-600 text-sm">Produto</th>
                                             <th className="p-4 font-semibold text-slate-600 text-sm">Categoria</th>
                                             <th className="p-4 font-semibold text-slate-600 text-sm">Preço</th>
-                                            <th className="p-4 font-semibold text-slate-600 text-sm text-center">Selecionar</th>
+                                            {viewMode === "offers" && <th className="p-4 font-semibold text-slate-600 text-sm">Promoção</th>}
+                                            <th className="p-4 font-semibold text-slate-600 text-sm text-center">Ação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {isLoadingProducts && searchResults.length === 0 ? (
                                             <tr>
-                                                <td colSpan={4} className="p-8 text-center text-slate-400">
+                                                <td colSpan={5} className="p-8 text-center text-slate-400">
                                                     Carregando...
                                                 </td>
                                             </tr>
                                         ) : searchResults.length === 0 ? (
                                             <tr>
-                                                <td colSpan={4} className="p-8 text-center text-slate-400">
+                                                <td colSpan={5} className="p-8 text-center text-slate-400">
                                                     Nenhum produto encontrado.
                                                 </td>
                                             </tr>
@@ -256,12 +283,32 @@ export default function OffersForm() {
                                                     <td className="p-4 font-medium text-slate-700 whitespace-nowrap">
                                                         R$ {formatCurrency(product.price)}
                                                     </td>
+                                                    {viewMode === "offers" && (
+                                                        <td className="p-4 font-bold text-emerald-600 whitespace-nowrap">
+                                                            R$ {formatCurrency(product.discountPrice || 0)}
+                                                        </td>
+                                                    )}
                                                     <td className="p-4 text-center">
-                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto transition-all ${selectedProduct?.id === product.id
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            {viewMode === "offers" && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleRemoveDiscount(product);
+                                                                    }}
+                                                                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                                                    title="Remover Desconto"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            )}
+                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${selectedProduct?.id === product.id
                                                                 ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
                                                                 : 'bg-slate-100 text-slate-300'
-                                                            }`}>
-                                                            <Check className="w-4 h-4" />
+                                                                }`}>
+                                                                <Check className="w-4 h-4" />
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -271,7 +318,6 @@ export default function OffersForm() {
                                 </table>
                             </div>
 
-                            {/* Pagination */}
                             {searchResults.length > 0 && (
                                 <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-center">
                                     <GenericPagination
@@ -286,7 +332,6 @@ export default function OffersForm() {
                     </section>
                 </div>
 
-                {/* Right Column: Offer Configuration */}
                 <div className="space-y-6">
                     <section className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6 sticky top-8">
                         <div className="flex items-center gap-3">
@@ -295,7 +340,7 @@ export default function OffersForm() {
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold text-slate-900">Configuração</h2>
-                                <p className="text-sm text-slate-400 font-medium">Defina preços e datas</p>
+                                <p className="text-sm text-slate-400 font-medium">Defina o preço promocional</p>
                             </div>
                         </div>
 
@@ -309,7 +354,6 @@ export default function OffersForm() {
                         ) : (
                             <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="space-y-4">
-                                    {/* Selected Product Summary */}
                                     <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
                                         <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white border border-slate-200 shrink-0">
                                             {selectedProduct.images && selectedProduct.images.length > 0 ? (
@@ -332,36 +376,6 @@ export default function OffersForm() {
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-xs font-bold uppercase text-slate-400 tracking-widest mb-2">Período da Promoção</label>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            <div className="relative">
-                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                                    <Calendar className="w-4 h-4" />
-                                                </div>
-                                                <input
-                                                    type="datetime-local"
-                                                    value={startDate}
-                                                    onChange={(e) => setStartDate(e.target.value)}
-                                                    className="w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm font-semibold text-slate-700"
-                                                />
-                                                <label className="absolute -top-1.5 left-3 bg-slate-50 px-1 text-[10px] font-bold text-slate-400 uppercase">Início</label>
-                                            </div>
-                                            <div className="relative">
-                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                                    <Calendar className="w-4 h-4" />
-                                                </div>
-                                                <input
-                                                    type="datetime-local"
-                                                    value={endDate}
-                                                    onChange={(e) => setEndDate(e.target.value)}
-                                                    className="w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm font-semibold text-slate-700"
-                                                />
-                                                <label className="absolute -top-1.5 left-3 bg-slate-50 px-1 text-[10px] font-bold text-slate-400 uppercase">Término</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <div className="h-px bg-slate-100 my-2"></div>
 
                                     <div>
@@ -375,7 +389,7 @@ export default function OffersForm() {
                                                         type="text"
                                                         value={currentPrice}
                                                         onChange={(e) => handleCurrencyChange(e.target.value, setCurrentPrice)}
-                                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-600"
+                                                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700"
                                                         placeholder="0,00"
                                                     />
                                                 </div>
@@ -401,20 +415,33 @@ export default function OffersForm() {
                                     </div>
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="w-full py-4 mt-6 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50 flex items-center justify-center gap-2 font-bold text-sm tracking-wide active:scale-[0.98]"
-                                >
-                                    {isSubmitting ? (
-                                        "Salvando..."
-                                    ) : (
-                                        <>
-                                            <Save className="w-4 h-4" />
-                                            Salvar Promoção
-                                        </>
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="flex-1 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50 flex items-center justify-center gap-2 font-bold text-sm tracking-wide active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed"
+                                    >
+                                        {isSubmitting ? (
+                                            "Salvando..."
+                                        ) : (
+                                            <>
+                                                <Save className="w-4 h-4" />
+                                                Salvar
+                                            </>
+                                        )}
+                                    </button>
+
+                                    {selectedProduct.discountPrice && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveDiscount(selectedProduct)}
+                                            className="px-6 py-4 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-100 transition-all flex items-center justify-center gap-2 font-bold text-sm cursor-pointer"
+                                            title="Remover Promoção"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
                                     )}
-                                </button>
+                                </div>
                             </div>
                         )}
                     </section>

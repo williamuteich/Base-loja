@@ -81,7 +81,7 @@ export default function GenericPagination({ page, totalPages, onPageChange }: Ge
     const visiblePages = getVisiblePages();
 
     return (
-        <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Pagination className="justify-center sm:justify-start">
                 <PaginationContent>
                     <PaginationItem>

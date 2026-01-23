@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Product, ProductVariant } from "@/types/product";
 import { StoreConfig } from "@/types/store-config";
 import { cn } from "@/lib/utils";
-import { Minus, Plus, MessageCircle, Truck, Store, Heart, Share2, Sparkles, Star, Package } from "lucide-react";
+import { Minus, Plus, MessageCircle, Truck, Store, Heart, Share2, Sparkles, Star, Package, ChevronRight } from "lucide-react";
 
 interface ProductDetailProps {
     product: Product;
@@ -17,7 +17,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const [quantity, setQuantity] = useState(1);
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [showAllSpecs, setShowAllSpecs] = useState(false);
 
     useEffect(() => {
         if (product.variants && product.variants.length > 0) {
@@ -38,6 +38,8 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
             value: String(value)
         }));
     }, [product.specs]);
+
+    const visibleSpecs = showAllSpecs ? specs : specs.slice(0, 2);
 
     const totalQuantity = useMemo(() => {
         return variants.reduce((sum, v) => sum + (v.quantity || 0), 0);
@@ -112,8 +114,9 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                             alt={product.title}
                             fill
                             priority
+                            quality={95}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
                             className="object-cover"
-                            unoptimized
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-rose-200">
@@ -165,8 +168,9 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                     src={`${backendUrl}/${image.url}`}
                                     alt={`Visualização ${i + 1}`}
                                     fill
+                                    quality={60}
+                                    sizes="120px"
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                    unoptimized
                                 />
                             </button>
                         ))}
@@ -236,7 +240,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                 <div className="w-3 h-8 bg-linear-to-b from-rose-400 to-pink-400 rounded-full" />
                                 <h3 className="text-lg font-semibold text-slate-800">Descrição</h3>
                             </div>
-                            <div className="prose prose-slate prose-lg text-slate-600 font-light leading-relaxed whitespace-pre-line pl-4">
+                            <div className="prose prose-slate prose-lg text-slate-600 font-light leading-relaxed whitespace-pre-line pl-4 text-sm">
                                 <p>{product.description}</p>
                             </div>
                         </div>
@@ -247,19 +251,30 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                     <div className="w-3 h-8 bg-linear-to-b from-rose-400 to-pink-400 rounded-full" />
                                     <h3 className="text-lg font-semibold text-slate-800">Detalhes</h3>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">
-                                    {specs.map((spec) => (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4 transition-all duration-300">
+                                    {visibleSpecs.map((spec) => (
                                         <div key={spec.key} className="flex items-center gap-3 p-3 bg-white/50 rounded-2xl border border-rose-100">
                                             <div className="w-8 h-8 flex items-center justify-center bg-rose-100 rounded-lg">
                                                 <Package size={16} className="text-rose-500" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="text-sm font-medium text-slate-400 capitalize">{spec.key}</div>
+                                                <div className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">{spec.key}</div>
                                                 <div className="text-sm text-slate-700 font-medium">{String(spec.value)}</div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
+                                {specs.length > 2 && (
+                                    <div className="pl-4">
+                                        <button
+                                            onClick={() => setShowAllSpecs(!showAllSpecs)}
+                                            className="text-rose-500 text-sm font-bold flex items-center gap-1 hover:text-rose-600 transition-colors uppercase tracking-widest mt-2 cursor-pointer"
+                                        >
+                                            {showAllSpecs ? "Ver menos" : "Mais detalhes"}
+                                            <ChevronRight className={cn("w-4 h-4 transition-transform", showAllSpecs ? "rotate-270" : "rotate-90")} />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -312,22 +327,22 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                     )}
 
                     <div className="space-y-6 pt-2">
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="flex items-center border-2 border-rose-100 rounded-full p-1.5 bg-white w-fit shadow-inner">
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center border-2 border-rose-100 rounded-full p-2 bg-white w-full shadow-inner h-16 sm:h-12">
                                 <button
                                     onClick={decreaseQuantity}
                                     className={cn(
-                                        "w-12 h-12 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
+                                        "w-12 h-12 sm:w-8 sm:h-8 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
                                         quantity <= 1 && "opacity-30 cursor-not-allowed"
                                     )}
                                 >
                                     <Minus size={18} />
                                 </button>
-                                <span className="w-12 text-center font-bold text-lg text-slate-800">{quantity}</span>
+                                <span className="flex-1 sm:w-10 text-center font-bold text-lg sm:text-base text-slate-800">{quantity}</span>
                                 <button
                                     onClick={increaseQuantity}
                                     className={cn(
-                                        "w-12 h-12 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
+                                        "w-12 h-12 sm:w-8 sm:h-8 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
                                         (!selectedVariant || quantity >= selectedVariant.quantity) && "opacity-30 cursor-not-allowed"
                                     )}
                                 >
@@ -338,9 +353,9 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                             <button
                                 onClick={contactViaWhatsApp}
                                 disabled={!selectedVariant || selectedVariant.quantity === 0}
-                                className="flex-1 cursor-pointer h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-bold text-sm tracking-[0.2em] uppercase shadow-xl shadow-rose-200 hover:shadow-rose-300 transition-all duration-500 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+                                className="w-full cursor-pointer py-4 px-4 sm:h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-bold text-base sm:text-sm tracking-[0.2em] uppercase shadow-xl shadow-rose-200 hover:shadow-rose-300 transition-all duration-500 flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed group"
                             >
-                                <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                <MessageCircle className="w-6 h-6 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
                                 <span>Solicitar via WhatsApp</span>
                             </button>
                         </div>

@@ -1,8 +1,13 @@
 import { Flame } from "lucide-react";
 import ProductCard from "./product-card";
-import OfferCarouselClient from "./offer-carousel-client";
 import { getPublicProducts } from "@/services/product";
-import { CarouselItem } from "@/components/ui/carousel";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface OfferProductsCarouselProps {
     backendUrl: string;
@@ -30,16 +35,31 @@ export default async function OfferProductsCarousel({ backendUrl }: OfferProduct
                     </div>
                 </div>
 
-                <OfferCarouselClient>
-                    {offerProducts.map((product) => (
-                        <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-[75%] sm:basis-[45%] md:basis-[30%] lg:basis-[22%] xl:basis-[18%]">
-                            <ProductCard
-                                product={product}
-                                backendUrl={backendUrl}
-                            />
-                        </CarouselItem>
-                    ))}
-                </OfferCarouselClient>
+                <div className="relative group/container">
+                    <Carousel
+                        opts={{
+                            align: "start",
+                            loop: false,
+                        }}
+                        className="w-full"
+                    >
+                        <CarouselContent className="-ml-4 md:-ml-6 pt-2 px-1 pb-4">
+                            {offerProducts.map((product) => (
+                                <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-[75%] sm:basis-[45%] md:basis-[30%] lg:basis-[22%] xl:basis-[18%]">
+                                    <ProductCard
+                                        product={product}
+                                        backendUrl={backendUrl}
+                                    />
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+
+                        <div className="hidden md:block">
+                            <CarouselPrevious className="absolute -left-4 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-2 border-rose-100 flex items-center justify-center text-rose-500 shadow-lg hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 opacity-0 group-hover/container:opacity-100 cursor-pointer disabled:opacity-0" />
+                            <CarouselNext className="absolute -right-4 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-2 border-rose-100 flex items-center justify-center text-rose-500 shadow-lg hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 opacity-0 group-hover/container:opacity-100 cursor-pointer disabled:opacity-0" />
+                        </div>
+                    </Carousel>
+                </div>
             </div>
         </section>
     );

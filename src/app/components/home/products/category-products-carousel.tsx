@@ -2,8 +2,15 @@
 
 import { useRef, useMemo } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import ProductCard from "./product-card";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface CategoryProductsCarouselProps {
     title: string;
@@ -22,44 +29,9 @@ export default function CategoryProductsCarousel({
     useAltBackground = false,
     backendUrl
 }: CategoryProductsCarouselProps) {
-    const scrollContainer = useRef<HTMLDivElement>(null);
-
     const activeProducts = useMemo(() => {
         return products.filter(p => p.isActive);
     }, [products]);
-
-    const smoothScrollTo = (element: HTMLElement, target: number, duration: number) => {
-        const start = element.scrollLeft;
-        const change = target - start;
-        const startTime = performance.now();
-
-        const animateScroll = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-
-            if (elapsed < duration) {
-                const t = elapsed / duration;
-                const ease = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-
-                element.scrollLeft = start + change * ease;
-                requestAnimationFrame(animateScroll);
-            } else {
-                element.scrollLeft = target;
-            }
-        };
-
-        requestAnimationFrame(animateScroll);
-    };
-
-    const scroll = (direction: "left" | "right") => {
-        if (!scrollContainer.current) return;
-        const container = scrollContainer.current;
-        const scrollAmount = container.clientWidth * 0.5;
-        const targetScrollLeft = direction === "left"
-            ? Math.max(0, container.scrollLeft - scrollAmount)
-            : Math.min(container.scrollWidth - container.clientWidth, container.scrollLeft + scrollAmount);
-
-        smoothScrollTo(container, targetScrollLeft, 600);
-    };
 
     if (activeProducts.length === 0) return null;
 
@@ -88,37 +60,29 @@ export default function CategoryProductsCarousel({
                 </div>
 
                 <div className="relative px-2 md:px-0 group/container">
-                    {activeProducts.length > 0 && (
-                        <>
-                            <button
-                                onClick={() => scroll('left')}
-                                className="absolute -left-4 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-2 border-rose-100 flex items-center justify-center text-rose-500 shadow-md hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 opacity-0 group-hover/container:opacity-100 cursor-pointer"
-                            >
-                                <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <button
-                                onClick={() => scroll('right')}
-                                className="absolute -right-4 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-2 border-rose-100 flex items-center justify-center text-rose-500 shadow-md hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 opacity-0 group-hover/container:opacity-100 cursor-pointer"
-                            >
-                                <ChevronRight className="w-5 h-5" />
-                            </button>
-                        </>
-                    )}
-
-                    <div
-                        ref={scrollContainer}
-                        className="flex overflow-x-auto gap-4 md:gap-6 pb-8 scroll-smooth no-scrollbar"
-                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    <Carousel
+                        opts={{
+                            align: "start",
+                            loop: false,
+                        }}
+                        className="w-full"
                     >
-                        {activeProducts.map((product) => (
-                            <div key={product.id} className="w-[45%] md:w-[30%] lg:w-[22%] xl:w-[18%] snap-start shrink-0">
-                                <ProductCard
-                                    product={product}
-                                    backendUrl={backendUrl}
-                                />
-                            </div>
-                        ))}
-                    </div>
+                        <CarouselContent className="-ml-4 md:-ml-6 pb-8">
+                            {activeProducts.map((product) => (
+                                <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-[75%] sm:basis-[45%] md:basis-[30%] lg:basis-[22%] xl:basis-[18%]">
+                                    <ProductCard
+                                        product={product}
+                                        backendUrl={backendUrl}
+                                    />
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+
+                        <div className="hidden md:block">
+                            <CarouselPrevious className="absolute -left-4 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-2 border-rose-100 flex items-center justify-center text-rose-500 shadow-md hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 opacity-0 group-hover/container:opacity-100 cursor-pointer disabled:opacity-0" />
+                            <CarouselNext className="absolute -right-4 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white border-2 border-rose-100 flex items-center justify-center text-rose-500 shadow-md hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 opacity-0 group-hover/container:opacity-100 cursor-pointer disabled:opacity-0" />
+                        </div>
+                    </Carousel>
                 </div>
             </div>
         </section>

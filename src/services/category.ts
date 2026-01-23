@@ -6,14 +6,17 @@ import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
-export async function getPublicCategories(homeOnly: boolean = false, includeProducts: boolean = false): Promise<Category[]> {
+export async function getPublicCategories(homeOnly: boolean = false, includeProducts: boolean = false, productsLimit: number = 25): Promise<Category[]> {
     "use cache";
     cacheTag("categories");
     cacheLife("hours");
     try {
         const url = new URL(`${API_URL}/api/public/category`);
         url.searchParams.set("homeOnly", homeOnly ? "true" : "false");
-        if (includeProducts) url.searchParams.set("includeProducts", "true");
+        if (includeProducts) {
+            url.searchParams.set("includeProducts", "true");
+            url.searchParams.set("productsLimit", productsLimit.toString());
+        }
 
         const res = await fetch(url.toString());
         if (!res.ok) throw new Error("Failed to fetch public categories");

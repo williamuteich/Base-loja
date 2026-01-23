@@ -2,6 +2,7 @@ import { Flame } from "lucide-react";
 import ProductCard from "./product-card";
 import OfferCarouselClient from "./offer-carousel-client";
 import { getPublicProducts } from "@/services/product";
+import { CarouselItem } from "@/components/ui/carousel";
 
 interface OfferProductsCarouselProps {
     backendUrl: string;
@@ -31,12 +32,12 @@ export default async function OfferProductsCarousel({ backendUrl }: OfferProduct
 
                 <OfferCarouselClient>
                     {offerProducts.map((product) => (
-                        <div key={product.id} className="w-[45%] md:w-[30%] lg:w-[22%] xl:w-[18%] snap-start shrink-0">
+                        <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-[75%] sm:basis-[45%] md:basis-[30%] lg:basis-[22%] xl:basis-[18%]">
                             <ProductCard
                                 product={product}
                                 backendUrl={backendUrl}
                             />
-                        </div>
+                        </CarouselItem>
                     ))}
                 </OfferCarouselClient>
             </div>

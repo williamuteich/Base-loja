@@ -34,7 +34,7 @@ export default async function Home() {
             key={category.id}
             title={category.name}
             description={category.description}
-            products={category.products?.map((p: any) => p.product) || []}
+            products={category.products || []}
             useAltBackground={index % 2 !== 0}
             backendUrl={API_URL}
           />

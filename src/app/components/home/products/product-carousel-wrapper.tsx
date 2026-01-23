@@ -22,9 +22,14 @@ export default function ProductCarouselWrapper({ children, hasProducts }: Produc
 
     useEffect(() => {
         checkScroll();
+        const timer = setTimeout(checkScroll, 500);
+
         window.addEventListener("resize", checkScroll);
-        return () => window.removeEventListener("resize", checkScroll);
-    }, [hasProducts]);
+        return () => {
+            window.removeEventListener("resize", checkScroll);
+            clearTimeout(timer);
+        };
+    }, [hasProducts, children]);
 
     const scroll = (direction: "left" | "right") => {
         if (!scrollContainerRef.current) return;
@@ -43,7 +48,7 @@ export default function ProductCarouselWrapper({ children, hasProducts }: Produc
             {showLeftArrow && (
                 <button
                     onClick={() => scroll("left")}
-                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-rose-600 hover:text-white transition-all duration-300 transform scale-0 group-hover/carousel:scale-100 opacity-0 group-hover/carousel:opacity-100"
+                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-rose-600 hover:text-white transition-all duration-300 transform scale-0 group-hover/carousel:scale-100 opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
                     aria-label="Scroll Left"
                 >
                     <ChevronLeft className="w-6 h-6" />
@@ -61,7 +66,7 @@ export default function ProductCarouselWrapper({ children, hasProducts }: Produc
             {showRightArrow && (
                 <button
                     onClick={() => scroll("right")}
-                    className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-rose-600 hover:text-white transition-all duration-300 transform scale-0 group-hover/carousel:scale-100 opacity-0 group-hover/carousel:opacity-100"
+                    className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-rose-600 hover:text-white transition-all duration-300 transform scale-0 group-hover/carousel:scale-100 opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
                     aria-label="Scroll Right"
                 >
                     <ChevronRight className="w-6 h-6" />

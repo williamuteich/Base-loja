@@ -6,12 +6,16 @@ import { cacheTag, cacheLife } from "next/cache";
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
-export async function getPublicProducts(): Promise<Product[]> {
+export async function getPublicProducts(hasDiscount?: boolean, limit?: number): Promise<Product[]> {
     "use cache";
     cacheTag("products");
     cacheLife("hours");
     try {
-        const res = await fetch(`${API_URL}/api/public/product`);
+        const url = new URL(`${API_URL}/api/public/product`);
+        if (hasDiscount) url.searchParams.set("hasDiscount", "true");
+        if (limit) url.searchParams.set("take", limit.toString());
+
+        const res = await fetch(url.toString());
         if (!res.ok) throw new Error("Failed to fetch public products");
         return await res.json();
     } catch (error) {

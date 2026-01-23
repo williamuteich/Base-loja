@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
         const where: any = {};
         if (search) {
-            where.name = { contains: search };
+            where.name = { contains: search, mode: 'insensitive' };
         }
 
         const [categories, total] = await Promise.all([

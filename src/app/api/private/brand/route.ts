@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
         const where: any = {};
         if (search) {
-            where.name = { contains: search };
+            where.name = { contains: search, mode: 'insensitive' };
         }
 
         const [brands, total] = await Promise.all([

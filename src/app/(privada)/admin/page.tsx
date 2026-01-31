@@ -95,7 +95,7 @@ export default async function AdminPage() {
                             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Painel de Controle</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-                            Vitrine <span className="text-blue-400">Digital</span> Elegante.
+                            Vitrine <span className="text-blue-400">Digital</span>.
                         </h1>
                         <p className="text-lg text-slate-300 leading-relaxed">
                             Bem-vindo ao centro de gestão da sua vitrine digital. Organize seu catálogo, destaque seus melhores produtos e encante seus visitantes com facilidade.

@@ -18,31 +18,31 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
     try {
-        const body = await request.json();
+        const formData = await request.formData();
         const config = await getOrCreateStoreConfig();
 
         const updatedConfig = await prisma.storeConfiguration.update({
             where: { id: config.id },
             data: {
-                storeName: body.name || body.storeName,
-                cnpj: body.cnpj,
-                description: body.description,
-                phone: body.phone,
-                whatsapp: body.whatsapp,
-                address: body.address,
-                city: body.city,
-                state: body.state,
-                zipCode: body.zipCode,
-                maintenanceMode: body.maintenanceMode,
-                maintenanceMessage: body.maintenanceMessage,
-                businessHours: body.businessHours,
-                googleMapsEmbedUrl: body.googleMapsEmbedUrl,
-                contactEmail: body.email || body.contactEmail,
-                notifyNewOrders: body.notifyNewOrders,
-                automaticNewsletter: body.automaticNewsletter,
-                seoTitle: body.seoTitle,
-                seoDescription: body.seoDescription,
-                seoKeywords: body.seoKeywords,
+                storeName: (formData.get("storeName") as string) || (formData.get("name") as string),
+                cnpj: formData.get("cnpj") as string,
+                description: formData.get("description") as string,
+                phone: formData.get("phone") as string,
+                whatsapp: formData.get("whatsapp") as string,
+                address: formData.get("address") as string,
+                city: formData.get("city") as string,
+                state: formData.get("state") as string,
+                zipCode: formData.get("zipCode") as string,
+                maintenanceMode: formData.get("maintenanceMode") === "true",
+                maintenanceMessage: formData.get("maintenanceMessage") as string,
+                businessHours: formData.get("businessHours") as string,
+                googleMapsEmbedUrl: formData.get("googleMapsEmbedUrl") as string,
+                contactEmail: (formData.get("contactEmail") as string) || (formData.get("email") as string),
+                notifyNewOrders: formData.get("notifyNewOrders") === "true",
+                automaticNewsletter: formData.get("automaticNewsletter") === "true",
+                seoTitle: formData.get("seoTitle") as string,
+                seoDescription: formData.get("seoDescription") as string,
+                seoKeywords: formData.get("seoKeywords") as string,
             },
         });
 

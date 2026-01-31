@@ -11,8 +11,6 @@ export default function SettingsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState<any>({
-        maintenanceMode: false,
-        maintenanceMessage: "",
         storeName: "",
         cnpj: "",
         description: "",
@@ -42,7 +40,6 @@ export default function SettingsPage() {
                 if (data) {
                     setFormData({
                         ...data,
-                        maintenanceMessage: data.maintenanceMessage || "",
                         description: data.description || "",
                         phone: data.phone || "",
                         whatsapp: data.whatsapp || "",
@@ -110,14 +107,7 @@ export default function SettingsPage() {
 
         if (name === "cnpj") maskedValue = maskCNPJ(value);
         if (name === "zipCode") maskedValue = maskCEP(value);
-        if (name === "whatsapp" || name === "phone") {
-            const digits = value.replace(/\D/g, "");
-            if (digits.length <= 10) {
-                maskedValue = digits.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
-            } else {
-                maskedValue = digits.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, "($1) $2-$3");
-            }
-        }
+        if (name === "whatsapp" || name === "phone") maskedValue = maskPhone(value);
 
         setFormData((prev: any) => ({
             ...prev,
@@ -135,7 +125,11 @@ export default function SettingsPage() {
     const onSubmit = async () => {
         setIsSaving(true);
         try {
-            await updateSettings(formData);
+            const data = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                data.append(key, String(value));
+            });
+            await updateSettings(data);
             toast.success("Configurações salvas com sucesso! ✨");
         } catch (error: any) {
             console.error("Error saving settings:", error);
@@ -197,10 +191,10 @@ export default function SettingsPage() {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700">Descrição</label>
+                        <label className="text-sm font-semibold text-slate-700">Slogan do Cabeçalho</label>
                         <textarea
                             name="description"
-                            value={formData.description}
+                            value={formData.description || ""}
                             onChange={handleChange}
                             rows={3}
                             className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition-all"

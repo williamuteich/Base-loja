@@ -21,40 +21,18 @@ const quickActions = [
         description: "Cadastre um novo item no catálogo",
         href: "/admin/products/create",
         icon: Plus,
-        color: "text-blue-600",
-        bg: "bg-blue-50"
-    },
-    {
-        title: "Gerenciar Banners",
-        description: "Destaques na página inicial",
-        href: "/admin/banners",
-        icon: ImageIcon,
-        color: "text-emerald-600",
-        bg: "bg-emerald-50"
-    },
-    {
-        title: "Categorias",
-        description: "Organize seus produtos",
-        href: "/admin/categories",
-        icon: Folder,
-        color: "text-purple-600",
-        bg: "bg-purple-50"
     },
     {
         title: "Configurações",
-        description: "Ajuste dados da loja",
+        description: "Títulos, descrições e contatos",
         href: "/admin/settings",
         icon: Settings,
-        color: "text-slate-600",
-        bg: "bg-slate-50"
     },
     {
         title: "Gerenciar Equipe",
         description: "Administradores do sistema",
         href: "/admin/team",
         icon: Users,
-        color: "text-indigo-600",
-        bg: "bg-indigo-50"
     }
 ]
 
@@ -72,6 +50,7 @@ export default async function AdminPage() {
             value: productsCount.toString(),
             description: "Catálogo completo",
             icon: Package,
+            trend: "neutral",
             color: "text-blue-600",
             bg: "bg-blue-50"
         },
@@ -80,6 +59,7 @@ export default async function AdminPage() {
             value: bannersCount.toString(),
             description: "Em destaque na home",
             icon: ImageIcon,
+            trend: bannersCount > 0 ? "up" : "neutral",
             color: "text-emerald-600",
             bg: "bg-emerald-50"
         },
@@ -88,6 +68,7 @@ export default async function AdminPage() {
             value: categoriesCount.toString(),
             description: "Coleções organizadas",
             icon: Folder,
+            trend: "neutral",
             color: "text-purple-600",
             bg: "bg-purple-50"
         },
@@ -96,6 +77,7 @@ export default async function AdminPage() {
             value: brandsCount.toString(),
             description: "Parceiras cadastradas",
             icon: Tag,
+            trend: "neutral",
             color: "text-indigo-600",
             bg: "bg-indigo-50"
         },
@@ -145,6 +127,12 @@ export default async function AdminPage() {
                                     <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
                                         <Icon className="w-5 h-5" />
                                     </div>
+                                    <div className="flex items-center">
+                                        {stat.trend === "up" && <ArrowUpRight className="w-4 h-4 text-emerald-500" />}
+                                        <span className={`text-xs font-bold ml-0.5 ${stat.trend === "up" ? "text-emerald-500" : "text-slate-400"}`}>
+                                            {stat.trend === "neutral" ? "Estável" : "↑"}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-slate-500">{stat.title}</p>
@@ -167,34 +155,38 @@ export default async function AdminPage() {
                             </div>
                         </CardHeader>
                         <CardContent className="p-8">
-                            <div className="space-y-6">
-                                <h4 className="text-sm font-bold text-slate-700">Resumo da Vitrine</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-2 w-2 rounded-full bg-blue-500" />
-                                            <span className="text-sm text-slate-600 font-medium">Produtos</span>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-4">
+                                    <h4 className="text-sm font-bold text-slate-700">Resumo</h4>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <span className="text-sm text-slate-600 font-medium">Produtos Cadastrados</span>
+                                            <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">{productsCount}</span>
                                         </div>
-                                        <span className="text-sm font-black text-slate-900">{productsCount}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                                            <span className="text-sm text-slate-600 font-medium">Banners</span>
+                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <span className="text-sm text-slate-600 font-medium">Banners Ativos</span>
+                                            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">{bannersCount}</span>
                                         </div>
-                                        <span className="text-sm font-black text-slate-900">{bannersCount}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-2 w-2 rounded-full bg-purple-500" />
-                                            <span className="text-sm text-slate-600 font-medium">Categorias</span>
+                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <span className="text-sm text-slate-600 font-medium">Categorias Ativas</span>
+                                            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">{categoriesCount}</span>
                                         </div>
-                                        <span className="text-sm font-black text-slate-900">{categoriesCount}</span>
                                     </div>
                                 </div>
-                                <p className="text-xs text-slate-400 leading-relaxed text-center pt-2">
-                                    Mantenha sua vitrine sempre atualizada para oferecer a melhor experiência aos seus clientes.
-                                </p>
+                                <div className="space-y-4">
+                                    <h4 className="text-sm font-bold text-slate-700">Ações Curtas</h4>
+                                    <p className="text-xs text-slate-400 leading-relaxed">
+                                        Mantenha seu catálogo atualizado para garantir que seus clientes vejam sempre as últimas novidades.
+                                    </p>
+                                    <div className="space-y-2">
+                                        <Button asChild variant="outline" className="w-full text-blue-600 border-blue-200 hover:bg-blue-50">
+                                            <Link href="/admin/banners">Gerenciar Banners</Link>
+                                        </Button>
+                                        <Button asChild variant="outline" className="w-full text-purple-600 border-purple-200 hover:bg-purple-50">
+                                            <Link href="/admin/categories">Gerenciar Categorias</Link>
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -207,15 +199,14 @@ export default async function AdminPage() {
                             const Icon = action.icon
                             return (
                                 <Link key={action.title} href={action.href} className="group">
-                                    <div className="bg-white border border-slate-200/60 p-4 rounded-2xl group-hover:border-blue-400/40 group-hover:shadow-lg group-hover:shadow-blue-500/5 transition-all duration-300 flex items-center gap-4">
-                                        <div className={`w-10 h-10 ${action.bg} ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                                            <Icon className="w-5 h-5" />
+                                    <div className="bg-white border border-slate-200/60 p-5 rounded-2xl group-hover:border-blue-400/40 group-hover:shadow-lg group-hover:shadow-blue-500/5 transition-all duration-300 flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                                            <Icon className="w-6 h-6" />
                                         </div>
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-1">{action.title}</h4>
-                                            <p className="text-[10px] text-slate-400 line-clamp-1">{action.description}</p>
+                                        <div>
+                                            <h4 className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">{action.title}</h4>
+                                            <p className="text-xs text-slate-400">{action.description}</p>
                                         </div>
-                                        <ArrowUpRight className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                                     </div>
                                 </Link>
                             )

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import {
@@ -10,7 +9,8 @@ import {
     X,
     Home,
     Layers,
-    Phone
+    Phone,
+    Tag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchHeader from "./searchHeader";
@@ -78,6 +78,7 @@ export default function HeaderMobile({ brandSlot, menuBrandSlot, socialSlot }: H
                                         <nav className="flex-1 px-4 py-6 flex flex-col">
                                             {[
                                                 { label: "Início", href: "/", icon: Home },
+                                                { label: "Promoções", href: "/promocoes", icon: Tag },
                                                 { label: "Produtos", href: "/produtos", icon: Layers },
                                                 { label: "Categorias", href: "/categorias", icon: Layers },
                                                 { label: "Contato", href: "/contato", icon: Phone },

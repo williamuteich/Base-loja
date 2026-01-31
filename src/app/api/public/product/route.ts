@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cacheTag, cacheLife } from "next/cache";
 
-async function getCachedProducts(skip: number, take: number, category?: string, search?: string) {
+async function getCachedProducts(skip: number, take: number, category?: string, search?: string, hasDiscount?: boolean) {
     "use cache";
     cacheTag("products");
     cacheLife("hours");
@@ -25,6 +25,10 @@ async function getCachedProducts(skip: number, take: number, category?: string, 
             { title: { contains: search } },
             { description: { contains: search } }
         ];
+    }
+
+    if (hasDiscount) {
+        where.discountPrice = { not: null };
     }
 
     return await prisma.product.findMany({
@@ -52,8 +56,9 @@ export async function GET(req: NextRequest) {
         const category = searchParams.get("category") || undefined;
         const search = searchParams.get("search") || undefined;
         const paginated = searchParams.get("paginated") === "true";
+        const hasDiscount = searchParams.get("hasDiscount") === "true";
 
-        const products = await getCachedProducts(skip, take, category, search);
+        const products = await getCachedProducts(skip, take, category, search, hasDiscount);
 
         if (paginated) {
             const where: any = { isActive: true };
@@ -69,6 +74,9 @@ export async function GET(req: NextRequest) {
                     { title: { contains: search } },
                     { description: { contains: search } }
                 ];
+            }
+            if (hasDiscount) {
+                where.discountPrice = { not: null };
             }
 
             const total = await prisma.product.count({ where });

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Grid3x3, LayoutList, ShoppingBag, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
 import { Category } from "@/types/category";
+import { ReactNode } from "react";
 import {
     Pagination,
     PaginationContent,
@@ -28,6 +29,8 @@ interface ProductsClientProps {
         totalPages: number;
     };
     backendUrl: string;
+    title?: ReactNode;
+    subtitle?: string;
 }
 
 export default function ProductsClient({
@@ -35,9 +38,12 @@ export default function ProductsClient({
     categories,
     meta,
     backendUrl,
+    title,
+    subtitle,
 }: ProductsClientProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const currentCategory = searchParams.get("categoria");
     const currentPage = parseInt(searchParams.get("page") || "1");
@@ -48,7 +54,7 @@ export default function ProductsClient({
         if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= meta.totalPages) {
             const params = new URLSearchParams(searchParams.toString());
             params.set("page", pageNum.toString());
-            router.push(`/produtos?${params.toString()}`);
+            router.push(`${pathname}?${params.toString()}`);
             setJumpPage("");
         }
     };
@@ -61,7 +67,7 @@ export default function ProductsClient({
             params.delete("categoria");
         }
         params.set("page", "1");
-        router.push(`/produtos?${params.toString()}`);
+        router.push(`${pathname}?${params.toString()}`);
     };
 
     const formatPrice = (price: number) => {
@@ -86,10 +92,14 @@ export default function ProductsClient({
         <div className="container mx-auto px-4">
             <div className="mb-10 text-center md:text-left">
                 <h1 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-3">
-                    Nossos <span className="text-pink-600">Produtos</span>
+                    {title || (
+                        <>
+                            Nossos <span className="text-pink-600">Produtos</span>
+                        </>
+                    )}
                 </h1>
                 <p className="text-slate-500 mt-2 text-base md:text-lg max-w-2xl">
-                    Descubra nossa coleção completa de produtos especiais, selecionados para você.
+                    {subtitle || "Descubra nossa coleção completa de produtos especiais, selecionados para você."}
                 </p>
             </div>
 
@@ -291,7 +301,7 @@ export default function ProductsClient({
                                             <PaginationPrevious
                                                 href={
                                                     currentPage > 1
-                                                        ? `/produtos?${new URLSearchParams({
+                                                        ? `${pathname}?${new URLSearchParams({
                                                             ...Object.fromEntries(searchParams),
                                                             page: (currentPage - 1).toString(),
                                                         }).toString()}`
@@ -313,7 +323,7 @@ export default function ProductsClient({
                                                 return (
                                                     <PaginationItem key={pageNum}>
                                                         <PaginationLink
-                                                            href={`/produtos?${new URLSearchParams({
+                                                            href={`${pathname}?${new URLSearchParams({
                                                                 ...Object.fromEntries(searchParams),
                                                                 page: pageNum.toString(),
                                                             }).toString()}`}
@@ -337,7 +347,7 @@ export default function ProductsClient({
                                             <PaginationNext
                                                 href={
                                                     currentPage < meta.totalPages
-                                                        ? `/produtos?${new URLSearchParams({
+                                                        ? `${pathname}?${new URLSearchParams({
                                                             ...Object.fromEntries(searchParams),
                                                             page: (currentPage + 1).toString(),
                                                         }).toString()}`

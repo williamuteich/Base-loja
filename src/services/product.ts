@@ -24,7 +24,7 @@ export async function getPublicProducts(hasDiscount?: boolean, limit?: number): 
     }
 }
 
-export async function getPaginatedPublicProducts(page: number = 1, limit: number = 12, category?: string, search?: string): Promise<ProductsResponse> {
+export async function getPaginatedPublicProducts(page: number = 1, limit: number = 12, category?: string, search?: string, hasDiscount?: boolean): Promise<ProductsResponse> {
     "use cache";
     cacheTag("products");
     cacheLife("hours");
@@ -35,6 +35,7 @@ export async function getPaginatedPublicProducts(page: number = 1, limit: number
         url.searchParams.set("paginated", "true");
         if (category) url.searchParams.set("category", category);
         if (search) url.searchParams.set("search", search);
+        if (hasDiscount) url.searchParams.set("hasDiscount", "true");
 
         const res = await fetch(url.toString());
         if (!res.ok) throw new Error("Failed to fetch paginated public products");

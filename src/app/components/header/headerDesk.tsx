@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -58,7 +57,7 @@ export default function HeaderDesk({ contactSlot, seoSlot, socialSlot, brandSlot
 
                         <nav className="flex items-center gap-1 shrink-0">
                             {[
-                                { label: "Início", href: "/" },
+                                { label: "Promoções", href: "/promocoes" },
                                 { label: "Produtos", href: "/produtos" },
                                 { label: "Categorias", href: "/categorias" },
                                 { label: "Contato", href: "/contato" },

@@ -6,15 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 import { createProduct, updateProduct } from "@/services/product";
-import { Brand } from "@/types/brand";
-import { Category } from "@/types/category";
-import { Product } from "@/types/product";
-
-interface ProductFormProps {
-    product?: Product | null;
-    brands: Brand[];
-    categories: Category[];
-}
+import { ProductFormProps } from "@/types/product";
 
 export default function ProductForm({ product, brands, categories }: ProductFormProps) {
     const router = useRouter();

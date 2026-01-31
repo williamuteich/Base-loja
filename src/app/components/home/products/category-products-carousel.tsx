@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import ProductCard from "./product-card";
@@ -11,15 +11,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-
-interface CategoryProductsCarouselProps {
-    title: string;
-    description?: string | null;
-    products: any[];
-    categoryPath?: string;
-    useAltBackground?: boolean;
-    backendUrl: string;
-}
+import { CategoryProductsCarouselProps } from "@/types/product";
 
 export default function CategoryProductsCarousel({
     title,

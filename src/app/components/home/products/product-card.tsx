@@ -1,11 +1,6 @@
-import { Product } from "@/types/product";
+import { ProductCardProps } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
-
-interface ProductCardProps {
-    product: Product;
-    backendUrl: string;
-}
 
 export default function ProductCard({ product, backendUrl }: ProductCardProps) {
     const mainImage = product.images[0]?.url;

@@ -8,12 +8,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-
-interface BannerPaginationProps {
-    page: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-}
+import { BannerPaginationProps } from "@/types/banner";
 
 export default function BannerPagination({ page, totalPages, onPageChange }: BannerPaginationProps) {
     if (totalPages <= 1) return null;

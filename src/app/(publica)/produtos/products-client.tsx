@@ -363,7 +363,6 @@ export default function ProductsClient({
                                     </PaginationContent>
                                 </Pagination>
 
-                                {/* Jump Input */}
                                 <div className="flex items-center gap-2 text-sm text-slate-500 pr-2 border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-4 w-full md:w-auto justify-center">
                                     <span className="whitespace-nowrap">Ir para:</span>
                                     <input

@@ -1,16 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Banner } from "@/types/banner";
+import { BannerFormProps } from "@/types/banner";
 import { ImagePlus, Loader2, Save } from "lucide-react";
 import Image from "next/image";
-
-interface BannerFormProps {
-    banner?: Banner;
-    onSave: (formData: FormData) => Promise<void>;
-    onCancel: () => void;
-    isSaving: boolean;
-}
 
 export default function BannerForm({ banner, onSave, onCancel, isSaving }: BannerFormProps) {
     const [title, setTitle] = useState(banner?.title || "");

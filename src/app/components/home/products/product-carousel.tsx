@@ -1,6 +1,5 @@
 "use client";
 
-import { Product } from "@/types/product";
 import ProductCard from "./product-card";
 import {
     Carousel,
@@ -9,11 +8,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-
-interface ProductCarouselProps {
-    products: Product[];
-    backendUrl: string;
-}
+import { ProductCarouselProps } from "@/types/product";
 
 export default function ProductCarousel({ products, backendUrl }: ProductCarouselProps) {
     if (products.length === 0) return null;

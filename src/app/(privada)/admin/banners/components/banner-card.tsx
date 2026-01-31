@@ -1,15 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Banner } from "@/types/banner";
+import { BannerCardProps } from "@/types/banner";
 import { SquarePen, Trash2, ImageIcon } from "lucide-react";
-
-interface BannerCardProps {
-    banner: Banner;
-    index: number;
-    onEdit: (banner: Banner) => void;
-    onDelete: (banner: Banner) => void;
-}
 
 export default function BannerCard({ banner, index, onEdit, onDelete }: BannerCardProps) {
     return (

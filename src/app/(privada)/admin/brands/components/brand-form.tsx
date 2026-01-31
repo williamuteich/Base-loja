@@ -1,15 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Brand } from "@/types/brand";
+import { BrandFormProps } from "@/types/brand";
 import { Loader2, Save, Tag } from "lucide-react";
-
-interface BrandFormProps {
-    brand?: Brand;
-    onSave: (data: { name: string; isActive: boolean }) => Promise<void>;
-    onCancel: () => void;
-    isSaving: boolean;
-}
 
 export default function BrandForm({ brand, onSave, onCancel, isSaving }: BrandFormProps) {
     const [name, setName] = useState(brand?.name || "");

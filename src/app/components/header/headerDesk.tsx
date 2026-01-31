@@ -3,16 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import SearchHeader from "./searchHeader";
-
-interface HeaderShellProps {
-    contactSlot: ReactNode;
-    seoSlot: ReactNode;
-    socialSlot: ReactNode;
-    brandSlot: ReactNode;
-}
+import { HeaderShellProps } from "@/types/header";
 
 export default function HeaderDesk({ contactSlot, seoSlot, socialSlot, brandSlot }: HeaderShellProps) {
     const [isScrolled, setIsScrolled] = useState(false);

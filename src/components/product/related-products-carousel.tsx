@@ -3,14 +3,9 @@
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Product } from "@/types/product";
+import { RelatedProductsCarouselProps } from "@/types/product";
 import { useEffect, useCallback, useState } from "react";
 import Autoplay from 'embla-carousel-autoplay'
-
-interface RelatedProductsCarouselProps {
-    products: Product[];
-    backendUrl: string;
-}
 
 export function RelatedProductsCarousel({ products, backendUrl }: RelatedProductsCarouselProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({

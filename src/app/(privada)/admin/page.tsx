@@ -155,10 +155,10 @@ export default async function AdminPage() {
                             </div>
                         </CardHeader>
                         <CardContent className="p-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 gap-8">
                                 <div className="space-y-4">
                                     <h4 className="text-sm font-bold text-slate-700">Resumo</h4>
-                                    <div className="space-y-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                         <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                                             <span className="text-sm text-slate-600 font-medium">Produtos Cadastrados</span>
                                             <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">{productsCount}</span>
@@ -171,20 +171,6 @@ export default async function AdminPage() {
                                             <span className="text-sm text-slate-600 font-medium">Categorias Ativas</span>
                                             <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">{categoriesCount}</span>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className="space-y-4">
-                                    <h4 className="text-sm font-bold text-slate-700">Ações Curtas</h4>
-                                    <p className="text-xs text-slate-400 leading-relaxed">
-                                        Mantenha seu catálogo atualizado para garantir que seus clientes vejam sempre as últimas novidades.
-                                    </p>
-                                    <div className="space-y-2">
-                                        <Button asChild variant="outline" className="w-full text-blue-600 border-blue-200 hover:bg-blue-50">
-                                            <Link href="/admin/banners">Gerenciar Banners</Link>
-                                        </Button>
-                                        <Button asChild variant="outline" className="w-full text-purple-600 border-purple-200 hover:bg-purple-50">
-                                            <Link href="/admin/categories">Gerenciar Categorias</Link>
-                                        </Button>
                                     </div>
                                 </div>
                             </div>

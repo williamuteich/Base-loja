@@ -11,13 +11,8 @@ import {
     CarouselPrevious,
     CarouselNext,
 } from "@/components/ui/carousel";
-import { Banner } from "@/types/banner";
+import { Banner, BannerCarouselProps } from "@/types/banner";
 import { cn } from "@/lib/utils";
-
-interface BannerCarouselProps {
-    banners: Banner[];
-    backendUrl: string;
-}
 
 export default function BannerCarousel({ banners, backendUrl }: BannerCarouselProps) {
     const [api, setApi] = React.useState<CarouselApi>();

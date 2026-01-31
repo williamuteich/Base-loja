@@ -8,12 +8,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-
-interface TeamPaginationProps {
-    page: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-}
+import { TeamPaginationProps } from "@/types/team";
 
 export default function TeamPagination({ page, totalPages, onPageChange }: TeamPaginationProps) {
     if (totalPages <= 1) return null;

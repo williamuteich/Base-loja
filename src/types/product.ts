@@ -1,4 +1,6 @@
 import { Category } from "./category";
+import { Brand } from "./brand";
+import { StoreConfig } from "./store-config";
 
 export interface Product {
     id: string;
@@ -31,11 +33,6 @@ export interface ProductImage {
     productId: string;
 }
 
-export interface Brand {
-    id: string;
-    name: string;
-}
-
 export interface ProductsResponse {
     data: Product[];
     meta: {
@@ -44,4 +41,49 @@ export interface ProductsResponse {
         limit: number;
         totalPages: number;
     };
+}
+
+export interface ProductFormProps {
+    product?: Product | null;
+    brands: Brand[];
+    categories: Category[];
+}
+
+export interface ProductCardProps {
+    product: Product;
+    backendUrl: string;
+}
+
+export interface CategoryProductsCarouselProps {
+    title: string;
+    description?: string | null;
+    products: any[];
+    categoryPath?: string;
+    useAltBackground?: boolean;
+    backendUrl: string;
+}
+
+export interface OfferProductsCarouselProps {
+    backendUrl: string;
+}
+
+export interface ProductGridProps {
+    products: Product[];
+    backendUrl: string;
+}
+
+export interface RelatedProductsCarouselProps {
+    products: Product[];
+    backendUrl: string;
+}
+
+export interface ProductDetailProps {
+    product: Product;
+    storeConfig: StoreConfig | null;
+    backendUrl: string;
+}
+
+export interface ProductCarouselProps {
+    products: Product[];
+    backendUrl: string;
 }

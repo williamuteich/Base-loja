@@ -6,14 +6,7 @@ import {
     Linkedin, MessageCircle, Music2, Pin,
     Globe, Trash2
 } from "lucide-react";
-import { SocialMedia } from "@/types/social-media";
-
-interface SocialMediaItemProps {
-    social: SocialMedia;
-    onDelete: (social: SocialMedia) => void;
-    onUpdate: (social: SocialMedia, newUrl: string) => void;
-    onToggle: (social: SocialMedia) => void;
-}
+import { SocialMediaItemProps } from "@/types/social-media";
 
 const getPlatformMeta = (platform: string) => {
     const p = platform.toLowerCase();

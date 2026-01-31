@@ -1,12 +1,7 @@
 "use client";
 
 import { Plus, Search } from "lucide-react";
-
-interface TeamHeaderProps {
-    search: string;
-    onSearchChange: (value: string) => void;
-    onAddClick: () => void;
-}
+import { TeamHeaderProps } from "@/types/team";
 
 export default function TeamHeader({ search, onSearchChange, onAddClick }: TeamHeaderProps) {
     return (

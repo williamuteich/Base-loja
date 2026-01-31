@@ -1,12 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Category } from "@/types/category";
+import { CategoryCarouselProps } from "@/types/category";
 import CategoryCarouselWrapper from "./category-carousel-wrapper";
-
-interface CategoryCarouselProps {
-    categories: Category[];
-    backendUrl: string;
-}
 
 export default function CategoryCarousel({ categories, backendUrl }: CategoryCarouselProps) {
     if (categories.length === 0) return null;

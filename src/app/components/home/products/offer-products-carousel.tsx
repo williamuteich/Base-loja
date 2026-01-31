@@ -8,10 +8,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-
-interface OfferProductsCarouselProps {
-    backendUrl: string;
-}
+import { OfferProductsCarouselProps } from "@/types/product";
 
 export default async function OfferProductsCarousel({ backendUrl }: OfferProductsCarouselProps) {
     const products = await getPublicProducts(true, 1000);

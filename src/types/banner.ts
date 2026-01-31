@@ -21,3 +21,35 @@ export interface BannersResponse {
         totalPages: number;
     };
 }
+
+export interface BannerCardProps {
+    banner: Banner;
+    index: number;
+    onEdit: (banner: Banner) => void;
+    onDelete: (banner: Banner) => void;
+}
+
+export interface BannerFormProps {
+    banner?: Banner;
+    onSave: (formData: FormData) => Promise<void>;
+    onCancel: () => void;
+    isSaving: boolean;
+}
+
+export interface BannerHeaderProps {
+    search: string;
+    onSearchChange: (value: string) => void;
+    onClearSearch: () => void;
+    onNewBanner: () => void;
+}
+
+export interface BannerPaginationProps {
+    page: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+}
+
+export interface BannerCarouselProps {
+    banners: Banner[];
+    backendUrl: string;
+}

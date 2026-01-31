@@ -1,15 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { SocialMedia } from "@/types/social-media";
+import { SocialMediaFormProps } from "@/types/social-media";
 import { Loader2, Save } from "lucide-react";
-
-interface SocialMediaFormProps {
-    socialMedia?: SocialMedia;
-    onSave: (data: { platform: string; url: string; isActive: boolean }) => Promise<void>;
-    onCancel: () => void;
-    isSaving: boolean;
-}
 
 export default function SocialMediaForm({ socialMedia, onSave, onCancel, isSaving }: SocialMediaFormProps) {
     const [platform, setPlatform] = useState(socialMedia?.platform || "");

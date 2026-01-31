@@ -1,16 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Category } from "@/types/category";
+import { CategoryFormProps } from "@/types/category";
 import { Upload, X, ImageIcon } from "lucide-react";
 import Image from "next/image";
-
-interface CategoryFormProps {
-    category?: Category;
-    onSave: (data: FormData) => Promise<void>;
-    onCancel: () => void;
-    isSaving: boolean;
-}
 
 export default function CategoryForm({ category, onSave, onCancel, isSaving }: CategoryFormProps) {
     const [name, setName] = useState(category?.name || "");

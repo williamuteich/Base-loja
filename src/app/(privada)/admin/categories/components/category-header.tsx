@@ -1,11 +1,5 @@
 import { Plus, Search, X } from "lucide-react";
-
-interface CategoryHeaderProps {
-    search: string;
-    onSearchChange: (value: string) => void;
-    onClearSearch: () => void;
-    onNewCategory: () => void;
-}
+import { CategoryHeaderProps } from "@/types/category";
 
 export default function CategoryHeader({ search, onSearchChange, onClearSearch, onNewCategory }: CategoryHeaderProps) {
     return (

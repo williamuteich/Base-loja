@@ -1,13 +1,7 @@
 "use client";
 
 import { Search, Plus, X } from "lucide-react";
-
-interface BannerHeaderProps {
-    search: string;
-    onSearchChange: (value: string) => void;
-    onClearSearch: () => void;
-    onNewBanner: () => void;
-}
+import { BannerHeaderProps } from "@/types/banner";
 
 export default function BannerHeader({
     search,

@@ -2,11 +2,7 @@
 
 import { useRef, useState, useEffect, ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-interface CategoryCarouselWrapperProps {
-    children: ReactNode;
-    hasCategories: boolean;
-}
+import { CategoryCarouselWrapperProps } from "@/types/category";
 
 export default function CategoryCarouselWrapper({ children, hasCategories }: CategoryCarouselWrapperProps) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);

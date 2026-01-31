@@ -2,16 +2,9 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
-import { Product, ProductVariant } from "@/types/product";
-import { StoreConfig } from "@/types/store-config";
+import { ProductVariant, ProductDetailProps } from "@/types/product";
 import { cn } from "@/lib/utils";
 import { Minus, Plus, MessageCircle, Truck, Store, Heart, Share2, Sparkles, Star, Package, ChevronRight } from "lucide-react";
-
-interface ProductDetailProps {
-    product: Product;
-    storeConfig: StoreConfig | null;
-    backendUrl: string;
-}
 
 export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetailProps) {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);

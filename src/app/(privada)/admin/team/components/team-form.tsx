@@ -1,15 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { TeamMember, TeamRole } from "@/types/team";
+import { TeamRole, TeamFormProps } from "@/types/team";
 import { Loader2, Save, User, Mail, Shield, Lock } from "lucide-react";
-
-interface TeamFormProps {
-    member?: TeamMember;
-    onSave: (data: any) => Promise<void>;
-    onCancel: () => void;
-    isSaving: boolean;
-}
 
 export default function TeamForm({ member, onSave, onCancel, isSaving }: TeamFormProps) {
     const [name, setName] = useState(member?.name || "");

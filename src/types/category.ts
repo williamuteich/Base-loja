@@ -22,3 +22,27 @@ export interface CategoriesResponse {
         totalPages: number;
     };
 }
+
+export interface CategoryFormProps {
+    category?: Category;
+    onSave: (data: FormData) => Promise<void>;
+    onCancel: () => void;
+    isSaving: boolean;
+}
+
+export interface CategoryHeaderProps {
+    search: string;
+    onSearchChange: (value: string) => void;
+    onClearSearch: () => void;
+    onNewCategory: () => void;
+}
+
+export interface CategoryCarouselWrapperProps {
+    children: React.ReactNode;
+    hasCategories: boolean;
+}
+
+export interface CategoryCarouselProps {
+    categories: Category[];
+    backendUrl: string;
+}

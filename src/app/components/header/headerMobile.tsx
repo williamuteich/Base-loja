@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
 import {
     Menu,
     X,
@@ -22,12 +21,7 @@ import {
     SheetTitle,
     SheetDescription
 } from "@/components/ui/sheet";
-
-interface HeaderShellProps {
-    brandSlot: ReactNode;
-    menuBrandSlot: ReactNode;
-    socialSlot: ReactNode;
-}
+import { HeaderShellProps } from "@/types/header";
 
 export default function HeaderMobile({ brandSlot, menuBrandSlot, socialSlot }: HeaderShellProps) {
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);

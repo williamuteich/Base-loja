@@ -1,13 +1,7 @@
 "use client";
 
-import { TeamMember } from "@/types/team";
-import { SquarePen, Trash2, User, ShieldCheck, Shield } from "lucide-react";
-
-interface TeamCardProps {
-    member: TeamMember;
-    onEdit: (member: TeamMember) => void;
-    onDelete: (member: TeamMember) => void;
-}
+import { TeamCardProps } from "@/types/team";
+import { SquarePen, Trash2, User, ShieldCheck } from "lucide-react";
 
 export default function TeamCard({ member, onEdit, onDelete }: TeamCardProps) {
     const isOwner = member.role === "ADMIN";

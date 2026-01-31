@@ -18,3 +18,17 @@ export interface BrandsResponse {
         totalPages: number;
     };
 }
+
+export interface BrandFormProps {
+    brand?: Brand;
+    onSave: (data: { name: string; isActive: boolean }) => Promise<void>;
+    onCancel: () => void;
+    isSaving: boolean;
+}
+
+export interface BrandHeaderProps {
+    search: string;
+    onSearchChange: (value: string) => void;
+    onClearSearch: () => void;
+    onNewBrand: () => void;
+}

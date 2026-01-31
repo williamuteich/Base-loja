@@ -1,10 +1,5 @@
-import { Product } from "@/types/product";
+import { ProductGridProps } from "@/types/product";
 import ProductCard from "./product-card";
-
-interface ProductGridProps {
-    products: Product[];
-    backendUrl: string;
-}
 
 export default function ProductGrid({ products, backendUrl }: ProductGridProps) {
     if (products.length === 0) return null;

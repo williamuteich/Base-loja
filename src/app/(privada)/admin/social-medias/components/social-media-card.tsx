@@ -1,13 +1,7 @@
 "use client";
 
-import { SocialMedia } from "@/types/social-media";
+import { SocialMediaCardProps } from "@/types/social-media";
 import { SquarePen, Trash2, Globe, Instagram, Facebook as FacebookIcon, Youtube, MessageCircle, Twitter, Linkedin, Music2, Pin } from "lucide-react";
-
-interface SocialMediaCardProps {
-    socialMedia: SocialMedia;
-    onEdit: (socialMedia: SocialMedia) => void;
-    onDelete: (socialMedia: SocialMedia) => void;
-}
 
 const getPlatformIcon = (platform: string) => {
     const p = platform.toLowerCase();

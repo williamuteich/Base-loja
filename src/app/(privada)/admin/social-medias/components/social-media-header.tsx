@@ -1,13 +1,7 @@
 "use client";
 
 import { Search, Plus, X } from "lucide-react";
-
-interface SocialMediaHeaderProps {
-    search: string;
-    onSearchChange: (value: string) => void;
-    onClearSearch: () => void;
-    onNewSocialMedia: () => void;
-}
+import { SocialMediaHeaderProps } from "@/types/social-media";
 
 export default function SocialMediaHeader({
     search,

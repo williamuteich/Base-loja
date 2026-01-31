@@ -1,13 +1,7 @@
 "use client";
 
 import { Plus, Search, X } from "lucide-react";
-
-interface BrandHeaderProps {
-    search: string;
-    onSearchChange: (value: string) => void;
-    onClearSearch: () => void;
-    onNewBrand: () => void;
-}
+import { BrandHeaderProps } from "@/types/brand";
 
 export default function BrandHeader({ search, onSearchChange, onClearSearch, onNewBrand }: BrandHeaderProps) {
     return (

@@ -1,26 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connection } from "next/server";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
     await connection();
     try {
-        const createTeam = await prisma.team.create({
-            data: {
-                name: "teste",
-                lastName: "teste",
-                email: "teste@teste.com",
-                password: "teste123",
+        const hashedPassword = await bcrypt.hash("admin", 10);
+
+        const team = await prisma.team.upsert({
+            where: { email: "team@admin.com" },
+            update: {
+                password: hashedPassword,
+                role: "ADMIN",
+                isActive: true
+            },
+            create: {
+                name: "Admin",
+                lastName: "Team",
+                email: "team@admin.com",
+                password: hashedPassword,
                 role: "ADMIN",
                 isActive: true
             }
-        })
+        });
 
-        return NextResponse.json({ message: "Equipe criada com sucesso", createTeam }, { status: 201 });
+        return NextResponse.json({
+            message: "Success",
+            team: {
+                id: team.id,
+                email: team.email,
+                role: team.role
+            }
+        }, { status: 201 });
     } catch (error) {
-        console.error("[API Public Create Team] POST Error:", error);
         return NextResponse.json(
-            { error: "Erro Interno do Servidor" },
+            { error: "Internal Server Error" },
             { status: 500 }
         );
     }

@@ -8,6 +8,7 @@ import { useEffect, useCallback, useState } from "react";
 import Autoplay from 'embla-carousel-autoplay'
 
 export function RelatedProductsCarousel({ products, backendUrl }: RelatedProductsCarouselProps) {
+    const safeBackendUrl = backendUrl?.includes("localhost") ? "" : backendUrl;
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: "start",
         loop: true,
@@ -54,7 +55,7 @@ export function RelatedProductsCarousel({ products, backendUrl }: RelatedProduct
                                 <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gray-100">
                                     {product.images && product.images.length > 0 ? (
                                         <Image
-                                            src={`${backendUrl}/${product.images[0].url}`}
+                                            src={`${safeBackendUrl}/${product.images[0].url}`}
                                             alt={product.title}
                                             fill
                                             className="object-cover transition-transform duration-500 group-hover:scale-110"

@@ -11,7 +11,8 @@ import { ProductFormProps } from "@/types/product";
 export default function ProductForm({ product, brands, categories }: ProductFormProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const backendUrl = process.env.API_URL || "http://localhost:3000";
+    const apiUrl = process.env.API_URL || "http://localhost:3000";
+    const backendUrl = apiUrl.includes("localhost") ? "" : apiUrl;
 
     const formatCurrency = (value: string | number) => {
         if (!value) return "";

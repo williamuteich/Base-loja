@@ -41,6 +41,7 @@ export default function ProductsClient({
     title,
     subtitle,
 }: ProductsClientProps) {
+    const safeBackendUrl = backendUrl?.includes("localhost") ? "" : backendUrl;
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -81,11 +82,11 @@ export default function ProductsClient({
         return Math.round(((price - discountPrice) / price) * 100);
     };
 
-    const fixImageUrl = (url: string | null) => {
-        if (!url) return null;
+    const fixImageUrl = (url: string | null | undefined) => {
+        if (!url) return "";
         if (url.startsWith("http")) return url;
         const cleanUrl = url.startsWith("/") ? url.substring(1) : url;
-        return `${backendUrl}/${cleanUrl}`;
+        return `${safeBackendUrl}/${cleanUrl}`;
     };
 
     return (
@@ -207,16 +208,16 @@ export default function ProductsClient({
                                     {product.images?.[0] ? (
                                         <>
                                             <Image
-                                                src={fixImageUrl(product.images[0].url)!}
+                                                src={fixImageUrl(product.images[0].url) || "/placeholder.png"}
                                                 alt={product.title}
                                                 fill
+                                                unoptimized
                                                 className="object-cover transition-transform duration-1200 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-110"
                                                 sizes="(max-width: 768px) 50vw, 25vw"
-                                                unoptimized
                                             />
                                             {product.images?.[1] && (
                                                 <Image
-                                                    src={fixImageUrl(product.images[1].url)!}
+                                                    src={fixImageUrl(product.images[1].url) || "/placeholder.png"}
                                                     alt={product.title}
                                                     fill
                                                     className="absolute inset-0 object-cover opacity-0 group-hover:opacity-100 transition-all duration-1000 cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-110"

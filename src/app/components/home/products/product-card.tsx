@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductCard({ product, backendUrl }: ProductCardProps) {
+    const safeBackendUrl = backendUrl?.includes("localhost") ? "" : backendUrl;
     const mainImage = product.images[0]?.url;
     const secondaryImage = product.images[1]?.url;
     const hasDiscount = product.discountPrice && product.discountPrice < product.price;
@@ -28,7 +29,7 @@ export default function ProductCard({ product, backendUrl }: ProductCardProps) {
                 {mainImage ? (
                     <>
                         <Image
-                            src={`${backendUrl}/${mainImage}`}
+                            src={`${safeBackendUrl}/${mainImage}`}
                             alt={product.title}
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -37,7 +38,7 @@ export default function ProductCard({ product, backendUrl }: ProductCardProps) {
                         />
                         {secondaryImage && (
                             <Image
-                                src={`${backendUrl}/${secondaryImage}`}
+                                src={`${safeBackendUrl}/${secondaryImage}`}
                                 alt={product.title}
                                 fill
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"

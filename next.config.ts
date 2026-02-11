@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   cacheComponents: true,
   images: {
+    qualities: [60, 75, 95],
     remotePatterns: [
       {
         protocol: 'http',
@@ -18,13 +19,13 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'http',
+        protocol: 'https',
         hostname: 'dcs4s04c0ok4kcok4sckco4s.187.77.38.192.sslip.io',
         port: '',
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'http',
         hostname: 'dcs4s04c0ok4kcok4sckco4s.187.77.38.192.sslip.io',
         port: '',
         pathname: '/**',

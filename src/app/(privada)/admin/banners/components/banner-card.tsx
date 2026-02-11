@@ -5,13 +5,15 @@ import { BannerCardProps } from "@/types/banner";
 import { SquarePen, Trash2, ImageIcon } from "lucide-react";
 
 export default function BannerCard({ banner, index, onEdit, onDelete }: BannerCardProps) {
+    const apiUrl = process.env.API_URL || "http://localhost:3000";
+    const backendUrl = apiUrl.includes("localhost") ? "" : apiUrl;
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4 p-4">
                 <div className="relative w-32 h-20 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-100">
                     {banner.imageDesktop ? (
                         <Image
-                            src={`${process.env.API_URL || "http://localhost:3000"}/${banner.imageDesktop}`}
+                            src={`${backendUrl}/${banner.imageDesktop}`}
                             alt={banner.title}
                             fill
                             className="object-cover"

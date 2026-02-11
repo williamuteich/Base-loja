@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Minus, Plus, MessageCircle, Truck, Store, Heart, Share2, Sparkles, Star, Package, ChevronRight } from "lucide-react";
 
 export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetailProps) {
+    const safeBackendUrl = backendUrl?.includes("localhost") ? "" : backendUrl;
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const [quantity, setQuantity] = useState(1);
@@ -103,10 +104,11 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                 <div className="relative aspect-square rounded-[2.5rem] overflow-hidden bg-linear-to-br from-white to-rose-50/30 border-2 border-rose-100 shadow-2xl shadow-rose-100/30">
                     {images.length > 0 ? (
                         <Image
-                            src={`${backendUrl}/${images[selectedImageIndex].url}`}
+                            src={`${safeBackendUrl}/${images[selectedImageIndex].url}`}
                             alt={product.title}
                             fill
                             priority
+                            unoptimized
                             quality={95}
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
                             className="object-cover"
@@ -158,9 +160,10 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                             >
                                 <div className="absolute inset-0 bg-linear-to-br from-white/50 to-transparent z-10" />
                                 <Image
-                                    src={`${backendUrl}/${image.url}`}
+                                    src={`${safeBackendUrl}/${image.url}`}
                                     alt={`Visualização ${i + 1}`}
                                     fill
+                                    unoptimized
                                     quality={60}
                                     sizes="120px"
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"

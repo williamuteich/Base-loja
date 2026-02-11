@@ -13,6 +13,8 @@ import DeleteConfirmation from "../../components/delete-confirmation";
 import { Product, ProductsResponse } from "@/types/product";
 
 export default function ProductsPage() {
+    const apiUrl = process.env.API_URL || "http://localhost:3000";
+    const backendUrl = apiUrl.includes("localhost") ? "" : apiUrl;
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState<ProductsResponse>({
         data: [],
@@ -147,7 +149,7 @@ export default function ProductsPage() {
                                                 <div className="w-12 h-12 bg-slate-100 rounded-lg overflow-hidden relative border border-slate-200 shrink-0">
                                                     {product.images?.[0] ? (
                                                         <Image
-                                                            src={product.images[0].url.startsWith("http") ? product.images[0].url : `${process.env.API_URL || "http://localhost:3000"}/${product.images[0].url}`}
+                                                            src={product.images[0].url.startsWith("http") ? product.images[0].url : `${backendUrl}/${product.images[0].url}`}
                                                             alt={product.title}
                                                             fill
                                                             className="object-cover"

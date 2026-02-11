@@ -102,8 +102,9 @@ export default function BannerCarousel({ banners, backendUrl }: BannerCarouselPr
 }
 
 function BannerImage({ banner, backendUrl, priority }: { banner: Banner; backendUrl: string; priority: boolean }) {
-    const imageUrl = `${backendUrl}/${banner.imageDesktop || banner.imageMobile}`;
-    const mobileImageUrl = `${backendUrl}/${banner.imageMobile || banner.imageDesktop}`;
+    const safeBackendUrl = backendUrl?.includes("localhost") ? "" : backendUrl;
+    const imageUrl = `${safeBackendUrl}/${banner.imageDesktop || banner.imageMobile}`;
+    const mobileImageUrl = `${safeBackendUrl}/${banner.imageMobile || banner.imageDesktop}`;
 
     return (
         <>

@@ -11,7 +11,7 @@ export default async function StoreBrand({ mobile = false, onPink = false }: { m
     const logo = (
         <div className="w-13 h-13 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
             {config?.logoUrl && config.logoUrl !== "null" ? (
-                <Image src={config.logoUrl} width={52} height={43} alt="Logo" priority className="rounded-full object-contain" />
+                <Image src={config.logoUrl} width={52} height={43} alt="Logo" priority unoptimized className="rounded-full object-contain" />
             ) : (
                 <div className={cn(
                     "w-full h-full flex items-center justify-center rounded-full shadow-inner",

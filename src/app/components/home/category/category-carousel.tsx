@@ -4,6 +4,7 @@ import { CategoryCarouselProps } from "@/types/category";
 import CategoryCarouselWrapper from "./category-carousel-wrapper";
 
 export default function CategoryCarousel({ categories, backendUrl }: CategoryCarouselProps) {
+    const safeBackendUrl = backendUrl?.includes("localhost") ? "" : backendUrl;
     if (categories.length === 0) return null;
 
     return (
@@ -31,13 +32,13 @@ export default function CategoryCarousel({ categories, backendUrl }: CategoryCar
                             <div className="relative aspect-3/4 md:aspect-square rounded-[2rem] overflow-hidden shadow-sm group-hover/card:shadow-2xl transition-all duration-700 border border-slate-100/50 bg-slate-50">
                                 {category.imageUrl ? (
                                     <Image
-                                        src={`${backendUrl}/${category.imageUrl}`}
+                                        src={`${safeBackendUrl}/${category.imageUrl}`}
                                         alt={category.name}
                                         fill
+                                        unoptimized
                                         sizes="(max-width: 768px) 140px, (max-width: 1024px) 190px, 220px"
                                         className="object-cover group-hover/card:scale-110 transition-transform duration-1000 ease-out"
                                         priority={i < 4}
-                                        unoptimized
                                     />
                                 ) : (
                                     <div className="absolute inset-0 bg-slate-50 flex items-center justify-center text-slate-300">

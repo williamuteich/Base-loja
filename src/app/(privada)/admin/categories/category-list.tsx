@@ -128,7 +128,7 @@ export default function CategoryList() {
                                 <div className="relative h-40 bg-slate-100">
                                     {category.imageUrl ? (
                                         <Image
-                                            src={`${process.env.NEXT_PUBLIC_API_URL || ""}/${category.imageUrl}`}
+                                            src={`${process.env.API_URL || ""}/${category.imageUrl}`}
                                             alt={category.name}
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-500"

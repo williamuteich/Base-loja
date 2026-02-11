@@ -11,7 +11,7 @@ export default function CategoryForm({ category, onSave, onCancel, isSaving }: C
     const [isActive, setIsActive] = useState(category?.isActive !== false);
     const [isHome, setIsHome] = useState(category?.isHome || false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(category?.imageUrl ? `${process.env.NEXT_PUBLIC_API_URL || ""}/${category.imageUrl}` : null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(category?.imageUrl ? `${process.env.API_URL || ""}/${category.imageUrl}` : null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 

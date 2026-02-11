@@ -10,7 +10,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import GenericPagination from "@/app/(privada)/components/generic-pagination";
 
 export default function OffersForm() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const backendUrl = process.env.API_URL || "http://localhost:3000";
 
     const [searchTerm, setSearchTerm] = useState("");
     const debouncedSearch = useDebounce(searchTerm, 500);

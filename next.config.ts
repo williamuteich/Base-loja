@@ -17,6 +17,30 @@ const nextConfig: NextConfig = {
         port: '3000',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'dcs4s04c0ok4kcok4sckco4s.187.77.38.192.sslip.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dcs4s04c0ok4kcok4sckco4s.187.77.38.192.sslip.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'bazarelegance.com.br',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'bazarelegance.com.br',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   experimental: {

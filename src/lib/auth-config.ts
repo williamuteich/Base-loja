@@ -106,9 +106,16 @@ export const auth: NextAuthOptions = {
             return session;
         },
         async redirect({ url, baseUrl }) {
-            if (url.startsWith("/")) return `${baseUrl}${url}`
-            else if (new URL(url).origin === baseUrl) return url
-            return baseUrl
+            const envBaseUrl = process.env.NEXTAUTH_URL || process.env.API_URL;
+            const effectiveBaseUrl = (envBaseUrl && baseUrl.includes('localhost')) ? envBaseUrl : baseUrl;
+
+            if (url.startsWith("/")) {
+                return `${effectiveBaseUrl}${url}`;
+            }
+            else if (new URL(url).origin === effectiveBaseUrl) {
+                return url;
+            }
+            return effectiveBaseUrl;
         }
     }
 }

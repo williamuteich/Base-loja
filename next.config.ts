@@ -20,13 +20,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'dcs4s04c0ok4kcok4sckco4s.187.77.38.192.sslip.io',
+        hostname: 'z4wkggkccsscw0kco00wwgs0.187.77.38.192.sslip.io',
         port: '',
         pathname: '/**',
       },
       {
         protocol: 'http',
-        hostname: 'dcs4s04c0ok4kcok4sckco4s.187.77.38.192.sslip.io',
+        hostname: 'z4wkggkccsscw0kco00wwgs0.187.77.38.192.sslip.io',
         port: '',
         pathname: '/**',
       },

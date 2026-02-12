@@ -38,6 +38,7 @@ export default function ProductForm({ product, brands, categories }: ProductForm
         setter(new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(floatValue));
     };
 
+    const [quantity, setQuantity] = useState("");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
@@ -61,6 +62,7 @@ export default function ProductForm({ product, brands, categories }: ProductForm
             setDiscountPrice(product.discountPrice ? formatCurrency(product.discountPrice) : "");
             setBrandId(product.brandId || "");
             setIsActive(product.isActive ?? true);
+            setQuantity(product.quantity?.toString() || "0");
 
             setKeptImageUrls(product.images?.map(img => img.url) || []);
             setSelectedCategoryIds(product.categories?.map(c => c.id) || []);
@@ -81,7 +83,7 @@ export default function ProductForm({ product, brands, categories }: ProductForm
                     quantity: v.quantity.toString()
                 })));
             } else {
-                setVariants([{ name: "Padrão", color: "#000000", quantity: "0" }]);
+                setVariants([]);
             }
         } else {
             setTitle("");
@@ -91,11 +93,12 @@ export default function ProductForm({ product, brands, categories }: ProductForm
             setBrandId("");
             setIsActive(true);
             setSpecs("");
+            setQuantity("0");
             setSelectedCategoryIds([]);
             setKeptImageUrls([]);
             setSelectedFiles([]);
             setPreviewUrls([]);
-            setVariants([{ name: "Padrão", color: "#000000", quantity: "0" }]);
+            setVariants([]);
         }
     }, [product]);
 
@@ -161,11 +164,20 @@ export default function ProductForm({ product, brands, categories }: ProductForm
                 return;
             }
 
+            if (variants.length === 0 && (!quantity || parseInt(quantity) < 0)) {
+                // Optional: enforce quantity > 0 or allow 0. Currently allowing 0.
+                // toast.error("Informe a quantidade de estoque.");
+            }
+
             formData.append("price", rawPrice); // Send raw number
             if (rawDiscountPrice) formData.append("discountPrice", rawDiscountPrice);
             if (brandId) formData.append("brandId", brandId);
             formData.append("isActive", isActive.toString());
             if (specs) formData.append("specs", specs);
+
+            if (variants.length === 0) {
+                formData.append("quantity", quantity);
+            }
 
             formData.append("variants", JSON.stringify(variants));
             formData.append("categoryIds", JSON.stringify(selectedCategoryIds));
@@ -333,6 +345,20 @@ export default function ProductForm({ product, brands, categories }: ProductForm
                                         </div>
                                     </div>
                                 </div>
+                                {variants.length === 0 && (
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Estoque Total</label>
+                                        <input
+                                            type="number"
+                                            value={quantity}
+                                            onChange={(e) => setQuantity(e.target.value)}
+                                            min="0"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            placeholder="0"
+                                        />
+                                        <p className="text-xs text-slate-400 mt-1">Quantidade disponível deste produto (sem variantes).</p>
+                                    </div>
+                                )}
                             </div>
                         </section>
 
@@ -342,7 +368,7 @@ export default function ProductForm({ product, brands, categories }: ProductForm
                                     <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
                                         <Plus className="w-4 h-4" />
                                     </div>
-                                    <h2 className="text-lg font-bold text-slate-900">Cores e Variantes</h2>
+                                    <h2 className="text-lg font-bold text-slate-900">Cores e Variantes (Opcional)</h2>
                                 </div>
                                 <button
                                     type="button"
@@ -356,8 +382,9 @@ export default function ProductForm({ product, brands, categories }: ProductForm
 
                             <div className="space-y-4">
                                 {variants.length === 0 ? (
-                                    <div className="text-center py-12 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 text-slate-400">
-                                        <p className="font-medium">Nenhuma variante. Clique em adicionar para começar.</p>
+                                    <div className="text-center py-8 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 text-slate-400">
+                                        <p className="font-medium text-sm">Este produto não possui variantes.</p>
+                                        <p className="text-xs mt-1">O estoque será gerenciado pelo campo "Estoque Total" acima. Clique em adicionar se quiser criar cores/tamanhos.</p>
                                     </div>
                                 ) : (
                                     variants.map((v, i) => (
@@ -597,9 +624,9 @@ export default function ProductForm({ product, brands, categories }: ProductForm
                             </div>
                         </section>
                     </div>
-                </div>
-            </form>
-        </div>
+                </div >
+            </form >
+        </div >
     );
 }
 

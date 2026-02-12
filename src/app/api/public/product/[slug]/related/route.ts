@@ -35,6 +35,12 @@ async function getCachedRelatedProducts(slug: string, limit: number) {
                         },
                     },
                 },
+                {
+                    OR: [
+                        { quantity: { gt: 0 } },
+                        { variants: { some: { quantity: { gt: 0 } } } }
+                    ]
+                }
             ],
         },
         take: limit,

@@ -17,6 +17,7 @@ export interface Product {
     brand?: Brand;
     brandId?: string;
     variants?: ProductVariant[];
+    quantity?: number;
 }
 
 export interface ProductVariant {

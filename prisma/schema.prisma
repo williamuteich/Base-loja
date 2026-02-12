@@ -53,6 +53,7 @@ model Product {
   updatedAt     DateTime? @updatedAt
   isActive      Boolean   @default(true)
   slug          String    @unique @map("slug")
+  quantity      Int       @default(0)
 
   variants ProductVariant[]
 

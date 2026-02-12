@@ -98,6 +98,11 @@ export async function PATCH(
             updateData.specs = specs;
         }
 
+        if (formData.has("quantity")) {
+            const quantity = parseInt(formData.get("quantity") as string);
+            if (!isNaN(quantity)) updateData.quantity = quantity;
+        }
+
         const currentProduct = await prisma.product.findUnique({
             where: { id },
             select: { title: true, slug: true }

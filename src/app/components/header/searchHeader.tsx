@@ -14,13 +14,13 @@ export default function SearchHeader({
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const [value, setValue] = useState(searchParams.get("q") || "");
+    const [value, setValue] = useState(searchParams.get("search") || "");
     const debouncedValue = useDebounce(value, 500);
     const isFirstRender = useRef(true);
     const isSyncingFromUrl = useRef(false);
 
     useEffect(() => {
-        const q = searchParams.get("q") || "";
+        const q = searchParams.get("search") || "";
         if (q !== value) {
             isSyncingFromUrl.current = true;
             setValue(q);
@@ -38,13 +38,13 @@ export default function SearchHeader({
             return;
         }
 
-        const currentQ = searchParams.get("q") || "";
+        const currentQ = searchParams.get("search") || "";
         if (debouncedValue !== currentQ) {
             const params = new URLSearchParams(searchParams.toString());
             if (debouncedValue.trim()) {
-                params.set("q", debouncedValue);
+                params.set("search", debouncedValue);
             } else {
-                params.delete("q");
+                params.delete("search");
             }
 
             router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -54,7 +54,7 @@ export default function SearchHeader({
     const handleClear = () => {
         setValue("");
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("q");
+        params.delete("search");
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 

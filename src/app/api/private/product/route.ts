@@ -84,6 +84,8 @@ export async function POST(req: NextRequest) {
         const brandId = formData.get("brandId") as string | null;
         const isActive = formData.get("isActive") !== "false";
 
+        const quantity = parseInt(formData.get("quantity") as string) || 0;
+
         const variantsJson = formData.get("variants") as string;
         const variants = variantsJson ? JSON.parse(variantsJson) : [];
 
@@ -145,6 +147,7 @@ export async function POST(req: NextRequest) {
                 price,
                 discountPrice,
                 isActive,
+                quantity,
                 specs: specs as any,
                 brandId: brandId || null,
                 variants: {

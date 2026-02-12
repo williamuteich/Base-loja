@@ -16,6 +16,13 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
     useEffect(() => {
         if (product.variants && product.variants.length > 0) {
             setSelectedVariant(product.variants[0]);
+            setQuantity(1);
+        } else {
+            if ((product.quantity || 0) > 0) {
+                setQuantity(1);
+            } else {
+                setQuantity(0);
+            }
         }
         if (product.images && product.images.length > 0) {
             setSelectedImageIndex(0);
@@ -36,8 +43,11 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
     const visibleSpecs = showAllSpecs ? specs : specs.slice(0, 2);
 
     const totalQuantity = useMemo(() => {
-        return variants.reduce((sum, v) => sum + (v.quantity || 0), 0);
-    }, [variants]);
+        if (variants.length > 0) {
+            return variants.reduce((sum, v) => sum + (v.quantity || 0), 0);
+        }
+        return product.quantity || 0;
+    }, [variants, product.quantity]);
 
     const handleVariantSelect = (variant: ProductVariant) => {
         setSelectedVariant(variant);
@@ -53,7 +63,8 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
     };
 
     const increaseQuantity = () => {
-        if (selectedVariant && quantity < selectedVariant.quantity) {
+        const max = selectedVariant ? (selectedVariant.quantity || 0) : (product.quantity || 0);
+        if (quantity < max) {
             setQuantity(prev => prev + 1);
         }
     };
@@ -324,12 +335,17 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
 
                     <div className="space-y-6 pt-2">
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center border-2 border-rose-100 rounded-full p-2 bg-white w-full shadow-inner h-16 sm:h-12">
+                            <div className="flex items-center border-2 border-rose-100 rounded-full p-2 bg-white w-full shadow-inner h-16 sm:h-12 relative overflow-hidden">
+                                {(variants.length > 0 ? (!selectedVariant || selectedVariant.quantity === 0) : ((product.quantity || 0) === 0)) && (
+                                    <div className="absolute inset-0 bg-slate-100/90 z-10 flex items-center justify-center font-bold text-slate-400 uppercase tracking-widest text-sm">
+                                        Esgotado
+                                    </div>
+                                )}
                                 <button
                                     onClick={decreaseQuantity}
                                     className={cn(
                                         "w-12 h-12 sm:w-8 sm:h-8 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
-                                        quantity <= 1 && "opacity-30 cursor-not-allowed"
+                                        (quantity <= 1 || (variants.length > 0 ? (!selectedVariant || selectedVariant.quantity === 0) : ((product.quantity || 0) === 0))) && "opacity-30 cursor-not-allowed"
                                     )}
                                 >
                                     <Minus size={18} />
@@ -339,7 +355,7 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
                                     onClick={increaseQuantity}
                                     className={cn(
                                         "w-12 h-12 sm:w-8 sm:h-8 flex cursor-pointer items-center justify-center rounded-full hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all",
-                                        (!selectedVariant || quantity >= selectedVariant.quantity) && "opacity-30 cursor-not-allowed"
+                                        ((variants.length > 0 ? (!selectedVariant || quantity >= selectedVariant.quantity) : (quantity >= (product.quantity || 0))) || (variants.length > 0 ? (!selectedVariant || selectedVariant.quantity === 0) : ((product.quantity || 0) === 0))) && "opacity-30 cursor-not-allowed"
                                     )}
                                 >
                                     <Plus size={18} />
@@ -348,11 +364,15 @@ export function ProductDetail({ product, storeConfig, backendUrl }: ProductDetai
 
                             <button
                                 onClick={contactViaWhatsApp}
-                                disabled={!selectedVariant || selectedVariant.quantity === 0}
-                                className="w-full cursor-pointer py-4 px-4 sm:h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-bold text-base sm:text-sm tracking-[0.2em] uppercase shadow-xl shadow-rose-200 hover:shadow-rose-300 transition-all duration-500 flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed group"
+                                disabled={variants.length > 0 ? (!selectedVariant || selectedVariant.quantity === 0) : ((product.quantity || 0) === 0)}
+                                className="w-full cursor-pointer py-4 px-4 sm:h-14 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-bold text-base sm:text-sm tracking-[0.2em] uppercase shadow-xl shadow-rose-200 hover:shadow-rose-300 transition-all duration-500 flex items-center justify-center gap-4 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed group"
                             >
                                 <MessageCircle className="w-6 h-6 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
-                                <span>Solicitar via WhatsApp</span>
+                                <span>
+                                    {(variants.length > 0 ? (!selectedVariant || selectedVariant.quantity === 0) : ((product.quantity || 0) === 0))
+                                        ? "Produto Indisponível"
+                                        : "Solicitar via WhatsApp"}
+                                </span>
                             </button>
                         </div>
                     </div>

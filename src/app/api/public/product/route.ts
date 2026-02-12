@@ -10,6 +10,14 @@ async function getCachedProducts(skip: number, take: number, category?: string, 
 
     const where: any = {
         isActive: true,
+        AND: [
+            {
+                OR: [
+                    { quantity: { gt: 0 } },
+                    { variants: { some: { quantity: { gt: 0 } } } }
+                ]
+            }
+        ]
     };
 
     if (category) {
@@ -21,10 +29,12 @@ async function getCachedProducts(skip: number, take: number, category?: string, 
     }
 
     if (search) {
-        where.OR = [
-            { title: { contains: search } },
-            { description: { contains: search } }
-        ];
+        where.AND.push({
+            OR: [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } }
+            ]
+        });
     }
 
     if (hasDiscount) {
@@ -61,7 +71,17 @@ export async function GET(req: NextRequest) {
         const products = await getCachedProducts(skip, take, category, search, hasDiscount);
 
         if (paginated) {
-            const where: any = { isActive: true };
+            const where: any = {
+                isActive: true,
+                AND: [
+                    {
+                        OR: [
+                            { quantity: { gt: 0 } },
+                            { variants: { some: { quantity: { gt: 0 } } } }
+                        ]
+                    }
+                ]
+            };
             if (category) {
                 where.categories = {
                     some: {
@@ -70,10 +90,12 @@ export async function GET(req: NextRequest) {
                 };
             }
             if (search) {
-                where.OR = [
-                    { title: { contains: search } },
-                    { description: { contains: search } }
-                ];
+                where.AND.push({
+                    OR: [
+                        { title: { contains: search, mode: "insensitive" } },
+                        { description: { contains: search, mode: "insensitive" } }
+                    ]
+                });
             }
             if (hasDiscount) {
                 where.discountPrice = { not: null };

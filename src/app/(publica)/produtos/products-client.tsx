@@ -104,7 +104,7 @@ export default function ProductsClient({
                 </p>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 sticky top-24 z-30 bg-white/80 backdrop-blur-md p-4 -mx-4 md:static md:bg-transparent md:p-0 rounded-2xl border border-slate-100 md:border-none shadow-sm md:shadow-none">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 p-4 -mx-4 md:p-0 rounded-2xl border border-slate-100 md:border-none shadow-sm md:shadow-none bg-white md:bg-transparent">
                 <div className="flex flex-wrap gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
                     <button
                         onClick={() => onCategorySelect(null)}
